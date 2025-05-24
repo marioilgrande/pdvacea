@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portale Inserimento Contratti ACEA</title>
+  <style>
+    :root { --acea-green: #0ABAB5; --bg-light: #f4f6f8; --card-bg: #ffffff; --text-grey: #555555; --border-light: #e0e0e0; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 20px; background: var(--bg-light); font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; }
+    .container { position: relative; width: 100%; max-width: 900px; background: var(--card-bg); border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); padding: 50px 30px 30px; }
+    .progress-container { position: absolute; top: 0; left: 0; width: 100%; height: 6px; background: var(--border-light); border-top-left-radius: 10px; border-top-right-radius: 10px; overflow: hidden; }
+    .progress { height: 100%; width: 33%; background: var(--acea-green); transition: width .3s; }
+    h2 { margin-top: 0; color: var(--acea-green); border-bottom: 2px solid var(--acea-green); padding-bottom: 5px; font-size: 1.6rem; }
+    .section { display: none; } .section.active { display: block; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; margin-bottom: 4px; color: var(--text-grey); font-weight: 500; }
+    .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: 6px; font-size: 1rem; background: #fff; }
+    .buttons { display: flex; justify-content: space-between; margin-top: 20px; }
+    .buttons button { padding: 12px 24px; border: none; border-radius: 6px; font-size: 1rem; color: #fff; cursor: pointer; transition: background .3s; }
+    .btn-next, .btn-send { background: var(--acea-green); } .btn-next:hover, .btn-send:hover { background: #089f99; }
+    .btn-back { background: #6c757d; } .btn-back:hover { background: #5a6268; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="progress-container"><div class="progress" id="progressBar"></div></div>
+    <form id="wizardForm" onsubmit="return false;">
+
+      <!-- Sezione 1: Anagrafica -->
+      <div class="section active" id="section-anagrafica">
+        <h2>Anagrafica</h2>
+        <div class="form-group">
+          <label>Tipo Cliente</label>
+          <select id="tipoCliente" required>
+            <option value="" disabled selected>-- Seleziona --</option>
+            <option value="privato">Privato</option>
+            <option value="business">Business</option>
+          </select>
+        </div>
+        <div class="form-group" id="group-nome">
+          <label id="label-nome">Nome e Cognome</label>
+          <input type="text" id="nome" required>
+        </div>
+        <div class="form-group hidden" id="group-azienda">
+          <label>Ragione Sociale</label>
+          <input type="text" id="azienda" required>
+        </div>
+        <div class="form-group" id="group-codice">
+          <label id="label-codice">Codice Fiscale</label>
+          <input type="text" id="codice" required>
+        </div>
+        <div class="form-group hidden" id="group-legaleRapp">
+          <label>Legale Rappresentante</label>
+          <input type="text" id="legaleRapp" required>
+        </div>
+        <div class="form-group hidden" id="group-codiceLegale">
+          <label>CF Legale Rappresentante</label>
+          <input type="text" id="codiceLegale" required>
+        </div>
+        <div class="form-group">
+          <label>Data di Nascita</label>
+          <input type="date" id="dataNascita" required>
+        </div>
+        <div class="form-group">
+          <label>Luogo di Nascita</label>
+          <input type="text" id="luogoNascita" required>
+        </div>
+        <div class="form-group">
+          <label>Indirizzo</label>
+          <input type="text" id="indirizzo" required>
+        </div>
+        <div class="form-group">
+          <label>Telefono</label>
+          <input type="tel" id="telefono" required>
+        </div>
+        <div class="form-group">
+          <label>Mail</label>
+          <input type="email" id="mail" required>
+        </div>
+        <div class="form-group">
+          <label>Documento</label>
+          <select id="tipoDoc" required>
+            <option value="" disabled selected>-- Seleziona --</option>
+            <option>Carta d'identità</option>
+            <option>Patente</option>
+            <option>Passaporto</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Numero Documento</label>
+          <input type="text" id="numeroDoc" required>
+        </div>
+        <div class="form-group">
+          <label>Data Rilascio</label>
+          <input type="date" id="dataRilascio" required>
+        </div>
+        <div class="form-group">
+          <label>Data Scadenza</label>
+          <input type="date" id="dataScadenza" required>
+        </div>
+        <div class="form-group">
+          <label>Rilasciato da</label>
+          <input type="text" id="rilasciatoDa" required>
+        </div>
+        <div class="buttons"><span></span><button class="btn-next" id="next1">Avanti</button></div>
+      </div>
+
+      <!-- Sezione 2: Fornitura -->
+      <div class="section" id="section-fornitura">
+        <h2>Fornitura</h2>
+        <div class="form-group">
+          <label>Stesso indirizzo Anagrafica?</label>
+          <select id="useSameAddress" required>
+            <option value="same" selected>Usa indirizzo anagrafica</option>
+            <option value="new">Inserisci nuovo indirizzo</option>
+          </select>
+        </div>
+        <div class="form-group hidden" id="group-indirizzoNew">
+          <label>Indirizzo Fornitura</label>
+          <input type="text" id="indirizzoForn" required>
+        </div>
+        <div class="form-group">
+          <label>Tipo Operazione</label>
+          <select id="tipoOp" required>
+            <option value="" disabled selected>-- Seleziona --</option>
+            <option value="SWITCH_LUCE">SWITCH LUCE</option>
+            <option value="SWITCH_GAS">SWITCH GAS</option>
+            <option value="SWITCH_DUAL">SWITCH DUAL</option>
+            <option value="SUBENTRO_LUCE">SUBENTRO LUCE</option>
+            <option value="SUBENTRO_GAS_A01">SUBENTRO GAS A01</option>
+            <option value="SUBENTRO_DUAL_LUCE_A01">SUBENTRO DUAL LUCE &gt; A01</option>
+            <option value="SUBENTRO_GAS_A40">SUBENTRO GAS A40</option>
+            <option value="SWITCH_VOLTURA_LUCE">SWITCH CON VOLTURA LUCE</option>
+          </select>
+        </div>
+        <div class="form-group hidden" id="group-pod">
+          <label>POD (luce)</label>
+          <input type="text" id="pod" required>
+        </div>
+        <div class="form-group hidden" id="group-pdr">
+          <label>PDR (gas)</label>
+          <input type="text" id="pdr" required>
+        </div>
+        <div class="form-group hidden" id="group-fornLuce">
+          <label>Fornitore Uscente Luce</label>
+          <input type="text" id="fornitoreUscenteLuce" required>
+        </div>
+        <div class="form-group hidden" id="group-fornGas">
+          <label>Fornitore Uscente Gas</label>
+          <input type="text" id="fornitoreUscenteGas" required>
+        </div>
+        <div class="form-group hidden" id="group-matricola">
+          <label>Matricola</label>
+          <input type="text" id="matricola" required>
+        </div>
+        <div class="form-group hidden" id="group-titoloOcc">
+          <label>Titolo Occupazionale</label>
+          <select id="titoloOcc" required>
+            <option value="" disabled selected>-- Seleziona --</option>
+            <option>Proprietario</option>
+            <option>Locazione</option>
+            <option>Altro</option>
+          </select>
+        </div>
+        <div class="form-group hidden" id="group-dataPossesso">
+          <label>Data Possesso</label>
+          <input type="date" id="dataPossesso" required>
+        </div>
+        <div class="form-group hidden" id="group-consumoAnnuale">
+          <label>Consumo Annuale (SWITCH GAS)</label>
+          <input type="number" id="consumoAnnuale" required>
+        </div>
+        <!-- Offerte dinamiche -->
+        <div class="form-group hidden" id="group-offertaPrivatoLuce">
+          <label>Offerta Luce</label>
+          <select id="offertaPrivatoLuce" required>
+            <option value="" disabled selected>-- Seleziona --</option>
+            <option>SPRINT LUCE</option>
+            <option>FLEX LUCE</option>
+            <option>FIX LUCE</option>
+          </select>
+        </div>
+        <div class="form-group hidden" id="group-offertaPrivatoGas">
+          <label>Offerta Gas</label>
+          <select id="offertaPrivatoGas" required>
+            <option value="" disabled selected>-- Seleziona --</option>
+            <option>SPRINT GAS</option>
+            <option>FLEX GAS</option>
+            <option>FIX GAS</option>
+          </select>
+        </div>
+        <div class="form-group hidden" id="group-offertaBusLuce">
+          <label>Offerta Luce</label>
+          <select id="offertaBusLuce" required>
+            <option value="" disabled selected>-- Seleziona --</option>
+            <option>SPRINT LUCE</option>
+          </select>
+        </div>
+        <div class="form-group hidden" id="group-offertaBusGas">
+          <label>Offerta Gas</label>
+          <select id="offertaBusGas" required>
+            <option value="" disabled selected>-- Seleziona --</option>
+            <option>SPRINT GAS</option>
+          </select>
+        </div>
+        <div class="buttons">
+          <button class="btn-back" id="back2">Indietro</button>
+          <button class="btn-next" id="next2">Avanti</button>
+        </div>
+      </div>
+
+      <!-- Sezione 3: Chiusura -->
+      <div class="section" id="section-chiusura">
+        <h2>Chiusura e Invio Contratto</h2>
+        <div class="form-group">
+          <label>Metodo di Pagamento</label>
+          <select id="metodoPag" required>
+            <option value="" disabled selected>-- Seleziona --</option>
+            <option value="IBAN">IBAN</option>
+            <option value="BOLLETTINO">BOLLETTINO</option>
+          </select>
+        </div>
+        <div class="form-group hidden" id="group-iban">
+          <label>IBAN</label>
+          <input type="text" id="iban" required>
+        </div>
+        <div class="buttons" style="gap:16px;">
+          <button class="btn-back" id="back3">Indietro</button>
+          <button class="btn-send" id="btnSendWhatsApp">Invia via WhatsApp</button>
+          <button class="btn-send" id="btnSendMail">Invia via Mail</button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+  <script>
+    const sections = [...document.querySelectorAll('.section')];
+    const progress = document.getElementById('progressBar');
+    const show = i => {
+      sections.forEach((s, idx) => s.classList.toggle('active', idx === i));
+      progress.style.width = `${(i+1)*33}%`;
+    };
+
+    document.getElementById('next1').onclick = () => show(1);
+    document.getElementById('back2').onclick = () => show(0);
+    document.getElementById('next2').onclick = () => show(2);
+    document.getElementById('back3').onclick = () => show(1);
+
+    // Anagrafica toggle
+    document.getElementById('tipoCliente').addEventListener('change', e => {
+      const priv = e.target.value === 'privato';
+      document.getElementById('group-nome').classList.toggle('hidden', !priv);
+      document.getElementById('group-azienda').classList.toggle('hidden', priv);
+      document.getElementById('group-legaleRapp').classList.toggle('hidden', priv);
+      document.getElementById('group-codiceLegale').classList.toggle('hidden', priv);
+      document.getElementById('label-nome').textContent = priv ? 'Nome e Cognome' : 'Ragione Sociale';
+      document.getElementById('label-codice').textContent = priv ? 'Codice Fiscale' : 'Partita IVA';
+    });
+
+    // Indirizzo scelta
+    document.getElementById('useSameAddress').addEventListener('change', e => {
+      document.getElementById('group-indirizzoNew').classList.toggle('hidden', e.target.value === 'same');
+    });
+
+    // Fornitura logic
+    document.getElementById('tipoOp').addEventListener('change', function() {
+      const v = this.value;
+      const priv = document.getElementById('tipoCliente').value === 'privato';
+      const isDual = v.includes('DUAL');
+      const isSwitch = v.startsWith('SWITCH');
+      const isLuceOnly = v.includes('LUCE') && !isDual;
+      const isGasOnly = v.includes('GAS') && !isDual;
+      const isSubGas = v==='SUBENTRO_GAS_A01'||v==='SUBENTRO_GAS_A40';
+      const isSubOrVolt = v.startsWith('SUBENTRO')||v==='SWITCH_VOLTURA_LUCE';
+
+      document.getElementById('group-pod').classList.toggle('hidden', !(isLuceOnly||isDual));
+      document.getElementById('group-pdr').classList.toggle('hidden', !(isGasOnly||isDual));
+      document.getElementById('group-fornLuce').classList.toggle('hidden', !(isSwitch&&(isLuceOnly||isDual)));
+      document.getElementById('group-fornGas').classList.toggle('hidden', !(isSwitch&&(isGasOnly||isDual)));
+      document.getElementById('group-matricola').classList.toggle('hidden', !isSubGas);
+      document.getElementById('group-titoloOcc').classList.toggle('hidden', !isSubOrVolt);
+      document.getElementById('group-dataPossesso').classList.toggle('hidden', !isSubOrVolt);
+      document.getElementById('group-consumoAnnuale').classList.toggle('hidden', v!=='SWITCH_GAS');
+
+      // Offerte luce e gas (incluso dual)
+      document.getElementById('group-offertaPrivatoLuce').classList.toggle('hidden', !(priv&&(isLuceOnly||isDual)));
+      document.getElementById('group-offertaPrivatoGas').classList.toggle('hidden', !(priv&&(isGasOnly||isDual)));
+      document.getElementById('group-offertaBusLuce').classList.toggle('hidden', !(!priv&&(isLuceOnly||isDual)));
+      document.getElementById('group-offertaBusGas').classList.toggle('hidden', !(!priv&&(isGasOnly||isDual)));
+    });
+
+    // Pagamento logic
+    document.getElementById('metodoPag').addEventListener('change', e => {
+      document.getElementById('group-iban').classList.toggle('hidden', e.target.value !== 'IBAN');
+    });
+
+    // Default date
+    document.getElementById('dataPossesso').valueAsDate = new Date();
+
+    // Gather & format
+    function gatherData() {
+      const d = {};
+      d.tipoCliente = document.getElementById('tipoCliente').value;
+      if (d.tipoCliente === 'privato') {
+        d.cliente = document.getElementById('nome').value;
+      } else {
+        d.cliente = document.getElementById('azienda').value;
+        d.legaleRapp = document.getElementById('legaleRapp').value;
+        d.cfLegale = document.getElementById('codiceLegale').value;
+      }
+      d.codice = document.getElementById('codice').value;
+      d.dataNascita = document.getElementById('dataNascita').value;
+      d.luogoNascita = document.getElementById('luogoNascita').value;
+      d.indirizzoAnagrafica = document.getElementById('indirizzo').value;
+      d.telefono = document.getElementById('telefono').value;
+      d.mail = document.getElementById('mail').value;
+      d.tipoDoc = document.getElementById('tipoDoc').value;
+      d.numeroDoc = document.getElementById('numeroDoc').value;
+      d.dataRilascio = document.getElementById('dataRilascio').value;
+      d.dataScadenza = document.getElementById('dataScadenza').value;
+      d.rilasciatoDa = document.getElementById('rilasciatoDa').value;
+
+      const addrChoice = document.getElementById('useSameAddress').value;
+      d.indirizzoForn = addrChoice === 'same'
+        ? d.indirizzoAnagrafica
+        : document.getElementById('indirizzoForn').value;
+
+      d.operazione = document.getElementById('tipoOp').value;
+      d.pod = document.getElementById('pod').value;
+      d.pdr = document.getElementById('pdr').value;
+      d.forLuce = document.getElementById('fornitoreUscenteLuce').value;
+      d.forGas = document.getElementById('fornitoreUscenteGas').value;
+      d.matricola = document.getElementById('matricola').value;
+      d.titoloOcc = document.getElementById('titoloOcc').value;
+      d.dataPossesso = document.getElementById('dataPossesso').value;
+      d.consumoAnnuale = document.getElementById('consumoAnnuale').value;
+
+      d.offPrivLuce = document.getElementById('offertaPrivatoLuce').value;
+      d.offPrivGas = document.getElementById('offertaPrivatoGas').value;
+      d.offBusLuce = document.getElementById('offertaBusLuce').value;
+      d.offBusGas = document.getElementById('offertaBusGas').value;
+
+      d.metodoPag = document.getElementById('metodoPag').value;
+      d.iban = document.getElementById('iban').value;
+
+      return d;
+    }
+
+    function formatMessage(d) {
+      let msg = `Ciao!\nTi chiedo di inserire questa pratica e darmi conferma inserimento:\n\n`;
+      msg += `Cliente: ${d.cliente} (${d.codice})\n`;
+      if (d.tipoCliente === 'business') msg += `Legale Rapp.: ${d.legaleRapp} (CF: ${d.cfLegale})\n`;
+      msg += `Data Nascita: ${d.dataNascita}, Luogo: ${d.luogoNascita}\n`;
+      msg += `Indirizzo Anagrafica: ${d.indirizzoAnagrafica}\n`;
+      msg += `Documento: ${d.tipoDoc} n. ${d.numeroDoc}, rilasciato ${d.dataRilascio} da ${d.rilasciatoDa}, scad. ${d.dataScadenza}\n`;
+      msg += `Operazione: ${d.operazione}\n`;
+      msg += `Fornitura a: ${d.indirizzoForn}\n`;
+      if (d.pod) msg += `POD: ${d.pod}\n`;
+      if (d.pdr) msg += `PDR: ${d.pdr}\n`;
+      if (d.forLuce) msg += `Fornitore luce: ${d.forLuce}\n`;
+      if (d.forGas) msg += `Fornitore gas: ${d.forGas}\n`;
+      if (d.matricola) msg += `Matricola gas: ${d.matricola}\n`;
+      if (d.titoloOcc) msg += `Titolo Occ.: ${d.titoloOcc}, possesso: ${d.dataPossesso}\n`;
+      if (d.consumoAnnuale) msg += `Consumo annuo: ${d.consumoAnnuale} Smc\n`;
+      if (d.offPrivLuce) msg += `Offerta Luce: ${d.offPrivLuce}\n`;
+      if (d.offPrivGas) msg += `Offerta Gas: ${d.offPrivGas}\n`;
+      if (d.offBusLuce) msg += `Offerta Luce BB: ${d.offBusLuce}\n`;
+      if (d.offBusGas) msg += `Offerta Gas BB: ${d.offBusGas}\n`;
+      msg += `Metodo Pagamento: ${d.metodoPag}`;
+      if (d.metodoPag === 'IBAN') msg += `, IBAN: ${d.iban}`;
+      msg += `\n\nGrazie per il supporto`;
+      return msg;
+    }
+
+    // INVIO WHATSAPP
+    document.getElementById('btnSendWhatsApp').onclick = () => {
+      const data = gatherData();
+      const text = formatMessage(data);
+      window.open(
+        `https://wa.me/393701357100?text=${encodeURIComponent(text)}`,
+        '_blank'
+      );
+    };
+
+    // INVIO MAIL
+    document.getElementById('btnSendMail').onclick = () => {
+      const data = gatherData();
+      const text = formatMessage(data);
+      const subject = `Richiesta inserimento ${data.cliente}`;
+      window.location.href =
+        `mailto:mario.isernia@e2kdistribution.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`;
+    };
+  </script>
+</body>
+</html>
