@@ -14,6 +14,7 @@
       --muted:#778;
       --border:#e5e7eb;
       --danger:#dc3545;
+      --ok:#22c55e;
     }
     *{box-sizing:border-box}
     body{
@@ -25,37 +26,55 @@
       position:relative; width:100%; max-width: 1000px;
       background:var(--card); border-radius:14px;
       box-shadow:0 8px 24px rgba(0,0,0,.08);
-      padding:72px 28px 28px;
+      padding:88px 28px 28px; /* più spazio per la toolbar */
     }
     .header{
-      position:absolute; inset:0 0 auto 0; height:56px;
+      position:absolute; inset:0 0 auto 0; height:64px;
       background: linear-gradient(90deg, var(--acea-green) 0%, #14d0ca 50%, var(--acea-green) 100%);
       border-top-left-radius:14px; border-top-right-radius:14px;
     }
     .title{
-      position:absolute; top:8px; left:20px; right:20px; height:40px;
+      position:absolute; top:8px; left:14px; right:14px; height:auto;
       display:flex; align-items:center; justify-content:space-between; color:#fff;
-      font-weight:600; gap:10px;
+      font-weight:600; gap:12px;
     }
-    .title small{ opacity:.9; font-weight:500 }
-    .title-right{ display:flex; align-items:center; gap:8px; }
+    .title h1{
+      margin:0; font-size:1.25rem; line-height:1.1;
+    }
+    .title small{ opacity:.95; font-weight:500; white-space:nowrap }
+    .title-right{
+      display:flex; align-items:center; gap:8px; flex-wrap:nowrap;
+    }
     .link-btn{
       background:transparent; color:#fff; border:1px solid rgba(255,255,255,.4);
-      border-radius:8px; padding:6px 10px; cursor:pointer; font-size:.9rem;
+      border-radius:10px; padding:8px 12px; cursor:pointer; font-size:.9rem;
+      display:inline-flex; align-items:center; gap:6px; white-space:nowrap;
     }
     .link-btn:hover{ background: rgba(255,255,255,.15); }
-    #saveStatus{ font-size:.85rem; opacity:.9 }
+    #saveStatus{ font-size:.85rem; opacity:.95 }
 
-    .progress-wrap{
-      position:absolute; top:56px; left:0; width:100%; height:6px;
-      background:var(--border); overflow:hidden; border-bottom:1px solid #ddd;
+    /* Toolbar responsive per smartphone */
+    @media (max-width: 640px){
+      .container{ padding:112px 12px 16px; }
+      .title{ top:6px; left:10px; right:10px; flex-direction:column; align-items:flex-start; gap:6px; }
+      .title h1{ font-size:1.05rem; }
+      .title-right{
+        width:100%;
+        overflow-x:auto;
+        -webkit-overflow-scrolling:touch;
+        scrollbar-width:none;
+        gap:8px;
+        padding-bottom:4px;
+      }
+      .title-right::-webkit-scrollbar{ display:none; }
+      .link-btn{ padding:8px 10px; font-size:.9rem; }
+      #saveStatus{ order:2; }
     }
+
+    .progress-wrap{ position:absolute; top:64px; left:0; width:100%; height:6px; background:var(--border); overflow:hidden; border-bottom:1px solid #ddd; }
     .progress{ height:100%; width:33.333%; background:var(--acea-green); transition: width .25s ease }
 
-    h2{
-      margin:0 0 14px; color:var(--acea-green);
-      font-size:1.35rem; border-bottom:2px solid var(--acea-green); padding-bottom:6px;
-    }
+    h2{ margin:0 0 14px; color:var(--acea-green); font-size:1.35rem; border-bottom:2px solid var(--acea-green); padding-bottom:6px; }
     p.help{ margin:0 0 18px; color:var(--muted); font-size:.95rem }
 
     .section{ display:none; }
@@ -64,27 +83,15 @@
     .grid{ display:grid; gap:14px; }
     @media (min-width: 900px){ .grid.cols-2{ grid-template-columns: 1fr 1fr; } }
 
-    .form-group{
-      display:flex; flex-direction:column;
-      background:#fff; border:1px solid var(--border); border-radius:10px;
-      padding:10px 12px;
-    }
+    .form-group{ display:flex; flex-direction:column; background:#fff; border:1px solid var(--border); border-radius:10px; padding:10px 12px; }
     .form-group.full{ grid-column: 1 / -1; }
     .form-group label{ font-size:.92rem; color:#555; margin-bottom:6px; font-weight:600 }
-    .form-group input, .form-group select{
-      width:100%; padding:12px; border:1px solid #e3e5e8; border-radius:8px; font-size:1rem; background:#fff;
-    }
-    .form-group input:focus, .form-group select:focus{
-      outline: none; border-color: var(--acea-green); box-shadow: 0 0 0 3px rgba(10,186,181,.12);
-    }
+    .form-group input, .form-group select{ width:100%; padding:12px; border:1px solid #e3e5e8; border-radius:8px; font-size:1rem; background:#fff; }
+    .form-group input:focus, .form-group select:focus{ outline: none; border-color: var(--acea-green); box-shadow: 0 0 0 3px rgba(10,186,181,.12); }
     .hidden{ display:none !important; }
 
     .buttons{ margin-top:18px; display:flex; flex-wrap:wrap; gap:10px; justify-content:flex-end; }
-    .btn{
-      border:none; border-radius:10px; padding:14px 18px; font-size:1rem;
-      color:#fff; cursor:pointer; transition: transform .05s ease, background .2s ease;
-      min-width: 160px; text-align:center;
-    }
+    .btn{ border:none; border-radius:10px; padding:14px 18px; font-size:1rem; color:#fff; cursor:pointer; transition: transform .05s ease, background .2s ease; min-width: 160px; text-align:center; }
     .btn:active{ transform: translateY(1px); }
     .btn-primary{ background:var(--acea-green); }
     .btn-primary:hover{ background:var(--acea-green-dark); }
@@ -94,38 +101,72 @@
     .btn-danger:hover{ filter:brightness(.95); }
 
     @media (max-width:768px){
-      body{ padding:10px; }
-      .container{ padding:78px 16px 16px; border-radius:12px; }
       .buttons{ flex-direction:column; }
       .btn{ width:100%; min-width:unset; }
     }
     .hint{ font-size:.85rem; color:#667; margin-top:4px }
 
-    /* ===== Modal Storico ===== */
-    .modal{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,.4); padding:20px; z-index:1000; }
+    /* ===== Modali (base) ===== */
+    .modal{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,.45); padding:20px; z-index:1000; }
     .modal.show{ display:flex; }
-    .modal-card{ background:#fff; border-radius:12px; width:100%; max-width:1000px; max-height:85vh; display:flex; flex-direction:column; overflow:hidden; }
+    .modal-card{ background:#fff; border-radius:12px; width:100%; max-width:1000px; max-height:85vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 18px 32px rgba(0,0,0,.2);}
     .modal-header, .modal-footer{ padding:12px 16px; background:#f7f9fa; border-bottom:1px solid #e5e7eb; }
     .modal-footer{ border-top:1px solid #e5e7eb; border-bottom:none; display:flex; gap:8px; justify-content:flex-end; }
     .modal-body{ padding:14px 16px; overflow:auto; }
     .modal-title{ font-weight:700; color:#333 }
-    .close-x{ background:transparent; border:none; font-size:20px; cursor:pointer; }
+    .close-x{ background:transparent; border:1px solid #dfe7e9; font-size:18px; cursor:pointer; width:36px; height:32px; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; }
+
+    /* Pulsanti nei modali (ben visibili su fondo chiaro) */
+    .modal .link-btn{
+      color:#0b3d3c;
+      border-color:#cfe7e6;
+      background:#f6fcfc;
+    }
+    .modal .link-btn:hover{ background:#e9f7f6; }
+
+    /* ===== Storico tabella ===== */
     .toolbar{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
     .toolbar input{ padding:10px; border:1px solid #e3e5e8; border-radius:8px; min-width:220px; }
+    .table-wrap{ max-height:60vh; overflow:auto; }
     table{ width:100%; border-collapse:collapse; }
     thead th{ position:sticky; top:0; background:#eef4f5; color:#333; text-align:left; padding:10px; border-bottom:1px solid #dfe7e9; font-size:.92rem; }
     tbody td{ padding:10px; border-bottom:1px solid #f0f2f4; vertical-align:top; font-size:.93rem; }
     .td-actions{ display:flex; gap:6px; flex-wrap:wrap; }
     .badge{ display:inline-block; padding:2px 8px; border-radius:999px; font-size:.8rem; background:#e8faf9; color:#077f7b; border:1px solid #c7efed; }
+    .badge-ok{ background:#eafaf0; color:#187a3c; border-color:#cdebd6; }
     .muted{ color:#666; font-size:.88rem; }
+
+    /* Vista compatta e consultabile */
+    .table-compact thead th{ padding:8px; }
+    .table-compact tbody td{ padding:6px 8px; font-size:.9rem; line-height:1.2; }
+    .table-compact .td-actions .link-btn{ padding:4px 8px; font-size:.82rem; }
+    .table-compact tbody tr:nth-child(even){ background:#fafcfc; }
+    .table-compact tbody tr:hover{ background:#eef6f6; }
+    td.trunc{ max-width:260px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    @media (max-width:640px){ td.trunc{ max-width:160px; } }
+
+    /* ===== Modal Dettagli ===== */
+    .tabs{ display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
+    .tab-btn{ border:1px solid #e3e5e8; background:#fff; color:#333; padding:8px 12px; border-radius:8px; cursor:pointer; }
+    .tab-btn.active{ background:#eef6f6; border-color:#bfe8e6; color:#055; }
+    .kv{ display:grid; gap:8px; grid-template-columns: 1fr; }
+    @media(min-width:800px){ .kv{ grid-template-columns: 1fr 1fr; } }
+    .kv-item{ background:#fff; border:1px solid #eef1f3; border-radius:8px; padding:8px 10px; }
+    .kv-item .k{ font-weight:600; color:#444; }
+    .kv-item .v{ color:#333; margin-top:2px; }
+    pre.code{ background:#0b1020; color:#e9eef5; padding:12px; border-radius:8px; overflow:auto; font-size:.9rem; line-height:1.35; }
+    .diff-table{ width:100%; border-collapse:collapse; }
+    .diff-table th, .diff-table td{ border-bottom:1px solid #eef1f3; padding:8px; text-align:left; }
+    .diff-same{ background:#f6fdf7; }
+    .diff-diff{ background:#fff8f0; }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header"></div>
     <div class="title">
-      <div>Portale Inserimento Contratti ACEA</div>
-      <div class="title-right">
+      <h1>Portale Inserimento Contratti ACEA</h1>
+      <div class="title-right" aria-label="Strumenti">
         <small id="saveStatus">Bozza non salvata</small>
         <button type="button" class="link-btn" id="btnSaveDraft">💾 Salva bozza</button>
         <button type="button" class="link-btn" id="btnClearDraft">🗑️ Cancella</button>
@@ -394,28 +435,28 @@
   </div>
 
   <!-- ===== Modal Storico Pratiche ===== -->
-  <div class="modal" id="historyModal" aria-hidden="true">
+  <div class="modal" id="historyModal" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal-card">
       <div class="modal-header" style="display:flex;justify-content:space-between;align-items:center;">
         <div class="modal-title">📁 Storico pratiche (locale)</div>
-        <button class="close-x" id="btnCloseHistory" aria-label="Chiudi">✕</button>
+        <button type="button" class="close-x" id="btnCloseHistory" aria-label="Chiudi">✕</button>
       </div>
       <div class="modal-body">
         <div class="toolbar">
-          <input type="search" id="historySearch" placeholder="Cerca per nome / ragione sociale, operazione, indirizzo..." />
+          <input type="search" id="historySearch" placeholder="Cerca per nome / operazione / indirizzo..." />
           <button class="btn btn-primary" id="btnExportCSV" type="button">⬇️ Esporta CSV</button>
           <button class="btn btn-danger" id="btnClearHistory" type="button">🗑️ Svuota archivio</button>
           <span class="muted" id="historyHint"></span>
         </div>
         <div class="table-wrap">
-          <table>
+          <table class="table-compact">
             <thead>
               <tr>
                 <th style="min-width:130px;">Data</th>
                 <th style="min-width:220px;">Cliente</th>
                 <th style="min-width:160px;">Operazione</th>
                 <th style="min-width:240px;">Indirizzo fornitura</th>
-                <th style="min-width:110px;">Canale</th>
+                <th style="min-width:110px;">Stato</th>
                 <th>Azioni</th>
               </tr>
             </thead>
@@ -424,13 +465,53 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button class="link-btn" id="btnCloseBottom" type="button">Chiudi</button>
+        <button type="button" class="link-btn" id="btnCloseBottom">Chiudi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Modal Dettagli/Verifica Pratica ===== -->
+  <div class="modal" id="detailModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-header" style="display:flex;justify-content:space-between;align-items:center;">
+        <div class="modal-title" id="detailTitle">🔎 Dettagli pratica</div>
+        <button type="button" class="close-x" id="btnCloseDetail" aria-label="Chiudi">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="detailMeta" class="muted" style="margin-bottom:10px;"></div>
+
+        <div class="tabs">
+          <button type="button" class="tab-btn active" id="tabSummary">Riepilogo</button>
+          <button type="button" class="tab-btn" id="tabDiff">Confronto con bozza</button>
+          <button type="button" class="tab-btn" id="tabMessage">Testo inviato</button>
+        </div>
+
+        <div id="panelSummary">
+          <div id="summaryBlocks" class="kv"></div>
+        </div>
+
+        <div id="panelDiff" class="hidden">
+          <table class="diff-table" id="diffTable">
+            <thead><tr><th>Campo</th><th>Valore inviato</th><th>Valore attuale</th><th>Stato</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div id="panelMessage" class="hidden">
+          <pre class="code" id="detailMessage"></pre>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="link-btn" id="btnCopySummary">Copia riepilogo</button>
+        <button type="button" class="link-btn" id="btnCopyMessage">Copia testo inviato</button>
+        <span style="flex:1"></span>
+        <button type="button" class="btn btn-secondary" id="btnToggleVerified">✔️ Segna come verificata</button>
       </div>
     </div>
   </div>
 
   <script>
-    /* ====================== UTIL DI VISIBILITÀ ======================= */
+    /* ====================== Utility visibilità ====================== */
     function setGroupVisibility(groupId, visible){
       const el = document.getElementById(groupId);
       if(!el) return;
@@ -446,100 +527,90 @@
       });
     }
 
-    /* ====================== NAV/PROGRESS ======================= */
+    /* ====================== Navigazione ====================== */
     const sections = [...document.querySelectorAll('.section')];
     const progress = document.getElementById('progressBar');
     const PROG = ['33.333%','66.666%','100%'];
-    const show = i => {
-      sections.forEach((s, idx) => s.classList.toggle('active', idx === i));
-      progress.style.width = PROG[i] || '33.333%';
-      currentStep = i;
-      window.scrollTo({ top:0, behavior:'smooth' });
-    };
     let currentStep = 0;
+    const show = i => { sections.forEach((s, idx) => s.classList.toggle('active', idx === i)); progress.style.width = PROG[i] || '33.333%'; currentStep=i; window.scrollTo({ top:0, behavior:'smooth' }); };
 
-    /* ====================== VALIDAZIONE ======================= */
+    /* ====================== Validazione ====================== */
     function validateSection(sectionId){
       const container = document.getElementById(sectionId);
       const fields = container.querySelectorAll('.form-group:not(.hidden) input, .form-group:not(.hidden) select, .form-group:not(.hidden) textarea');
       for(const f of fields){
         if(f.disabled) continue;
-        const isEmpty = (f.tagName === 'SELECT')
-          ? (f.value === '' || f.selectedIndex === 0)
-          : (f.value.trim() === '');
-        if(isEmpty){
-          const label = (f.closest('.form-group')?.querySelector('label')?.innerText || f.id);
-          alert(`Compila il campo: ${label}`);
-          f.focus();
-          return false;
-        }
+        const isEmpty = (f.tagName === 'SELECT') ? (f.value === '' || f.selectedIndex === 0) : (f.value.trim() === '');
+        if(isEmpty){ const label = (f.closest('.form-group')?.querySelector('label')?.innerText || f.id); alert(`Compila il campo: ${label}`); f.focus(); return false; }
       }
       return true;
     }
-    function validateAll(){
-      return validateSection('section-anagrafica') &&
-             validateSection('section-fornitura') &&
-             validateSection('section-chiusura');
-    }
+    function validateAll(){ return validateSection('section-anagrafica') && validateSection('section-fornitura') && validateSection('section-chiusura'); }
 
-    /* ====================== RACCOLTA MESSAGGIO ======================= */
+    /* ====================== Raccolta dati / messaggio ====================== */
     function collectVisibleLabeledData(){
-      const order = [
-        { id:'section-anagrafica', title:'ANAGRAFICA' },
-        { id:'section-fornitura',  title:'FORNITURA'  },
-        { id:'section-chiusura',   title:'CHIUSURA'   },
-      ];
-      const blocks = [];
-      order.forEach(sec => {
-        const groups = document.querySelectorAll(`#${sec.id} .form-group:not(.hidden)`);
-        const lines = [];
-        groups.forEach(g => {
-          const labelEl = g.querySelector('label');
-          const ctrl = g.querySelector('input,select,textarea');
-          if(!ctrl) return;
-          let value = '';
-          if(ctrl.tagName === 'SELECT'){
-            const opt = ctrl.options[ctrl.selectedIndex];
-            value = opt ? opt.text : '';
-          }else{
-            value = ctrl.value;
-          }
-          const lab = labelEl ? labelEl.innerText : (ctrl.id || 'Campo');
-          if(value !== '') lines.push(`${lab}: ${value}`);
-        });
+    const order = [
+      { id:'section-anagrafica', title:'ANAGRAFICA' },
+      { id:'section-fornitura',  title:'FORNITURA'  },
+      { id:'section-chiusura',   title:'PAGAMENTO'   }
+    ];
 
-        // Indirizzo fornitura risolto
-        if(sec.id === 'section-fornitura'){
-          const same = document.getElementById('useSameAddress').value === 'same';
-          const indAna = document.getElementById('indirizzo').value;
-          const indForn = document.getElementById('indirizzoForn').value;
-          const alreadyHasForn = lines.some(l => l.startsWith('Indirizzo Fornitura:'));
-          const valueToUse = same ? indAna : indForn;
-          if(valueToUse && !alreadyHasForn){
-            lines.push(`Indirizzo Fornitura: ${valueToUse}`);
+    const blocks = [];
+
+    order.forEach(sec => {
+      const groups = document.querySelectorAll(`#${sec.id} .form-group:not(.hidden)`);
+      const lines = [];
+      let fornituraAddressInserted = false;
+
+      groups.forEach(g => {
+        const labelEl = g.querySelector('label');
+        const ctrl = g.querySelector('input,select,textarea');
+        if(!ctrl) return;
+
+        // 🔧 Caso speciale: "Stesso indirizzo Anagrafica?"
+        // Non scrivere "Usa indirizzo anagrafica", ma la riga con l'indirizzo risolto
+        if (ctrl.id === 'useSameAddress') {
+          const addr = resolvedFornituraAddress(); // anagrafica o nuovo indirizzo
+          if (addr) {
+            lines.push(`Indirizzo Fornitura: ${addr}`);
+            fornituraAddressInserted = true;
           }
+          return; // evitare di aggiungere la label "Stesso indirizzo Anagrafica?"
         }
 
-        if(lines.length) blocks.push(`— ${sec.title} —\n${lines.join('\n')}`);
+        // Altri campi: normale etichetta: valore
+        let value = '';
+        if (ctrl.tagName === 'SELECT') {
+          const opt = ctrl.options[ctrl.selectedIndex];
+          value = opt ? opt.text : '';
+        } else {
+          value = ctrl.value;
+        }
+        const lab = labelEl ? labelEl.innerText : (ctrl.id || 'Campo');
+        if (value !== '') lines.push(`${lab}: ${value}`);
       });
-      return blocks.join('\n\n');
-    }
-    function buildMessage(){
-      const body = collectVisibleLabeledData();
-      return `Ciao!\nTi chiedo di inserire questa pratica e darmi conferma inserimento:\n\n${body}\n\nGrazie per il supporto`;
-    }
-    function resolvedFornituraAddress(){
-      const same = document.getElementById('useSameAddress').value === 'same';
-      return same ? document.getElementById('indirizzo').value : document.getElementById('indirizzoForn').value;
-    }
 
-    /* ====================== NAV BUTTONS ======================= */
+      // Fallback di sicurezza (se per qualche motivo non è entrato sopra)
+      if (sec.id === 'section-fornitura' && !fornituraAddressInserted) {
+        const addr = resolvedFornituraAddress();
+        if (addr) lines.push(`Indirizzo Fornitura: ${addr}`);
+      }
+
+      if (lines.length) blocks.push(`— ${sec.title} —\n${lines.join('\n')}`);
+    });
+
+    return blocks.join('\n\n');
+  }
+    function buildMessage(){ const body = collectVisibleLabeledData(); return `Ciao!\nTi chiedo di inserire questa pratica e darmi conferma inserimento:\n\n${body}\n\nGrazie per il supporto`; }
+    function resolvedFornituraAddress(){ const same = document.getElementById('useSameAddress').value === 'same'; return same ? document.getElementById('indirizzo').value : document.getElementById('indirizzoForn').value; }
+
+    /* ====================== Nav buttons ====================== */
     document.getElementById('next1').onclick = () => { if(validateSection('section-anagrafica')) show(1); };
     document.getElementById('back2').onclick = () => show(0);
     document.getElementById('next2').onclick = () => { if(validateSection('section-fornitura')) show(2); };
     document.getElementById('back3').onclick = () => show(1);
 
-    /* ====================== LOGICHE DINAMICHE ======================= */
+    /* ====================== Logiche dinamiche ====================== */
     document.getElementById('tipoCliente').addEventListener('change', e => {
       const priv = e.target.value === 'privato';
       setGroupVisibility('group-nome', priv);
@@ -549,19 +620,13 @@
       document.getElementById('label-nome').textContent = priv ? 'Nome e Cognome' : 'Ragione Sociale';
       document.getElementById('label-codice').textContent = priv ? 'Codice Fiscale' : 'Partita IVA';
     });
-    document.getElementById('useSameAddress').addEventListener('change', e => {
-      setGroupVisibility('group-indirizzoNew', e.target.value === 'new');
-    });
+    document.getElementById('useSameAddress').addEventListener('change', e => { setGroupVisibility('group-indirizzoNew', e.target.value === 'new'); });
     document.getElementById('tipoOp').addEventListener('change', function(){
       const v = this.value;
       const priv = document.getElementById('tipoCliente').value === 'privato';
-      const isDual = v.includes('DUAL');
-      const isSwitch = v.startsWith('SWITCH');
-      const isLuceOnly = v.includes('LUCE') && !isDual;
-      const isGasOnly  = v.includes('GAS')  && !isDual;
-      const isSubGas   = v==='SUBENTRO_GAS_A01' || v==='SUBENTRO_GAS_A40';
-      const isSubOrVolt= v.startsWith('SUBENTRO') || v==='SWITCH_VOLTURA_LUCE';
-
+      const isDual = v.includes('DUAL'); const isSwitch = v.startsWith('SWITCH');
+      const isLuceOnly = v.includes('LUCE') && !isDual; const isGasOnly  = v.includes('GAS')  && !isDual;
+      const isSubGas = v==='SUBENTRO_GAS_A01' || v==='SUBENTRO_GAS_A40'; const isSubOrVolt= v.startsWith('SUBENTRO') || v==='SWITCH_VOLTURA_LUCE';
       setGroupVisibility('group-pod', (isLuceOnly || isDual));
       setGroupVisibility('group-pdr', (isGasOnly  || isDual));
       setGroupVisibility('group-fornLuce', (isSwitch && (isLuceOnly || isDual)));
@@ -570,100 +635,52 @@
       setGroupVisibility('group-titoloOcc', isSubOrVolt);
       setGroupVisibility('group-dataPossesso', isSubOrVolt);
       setGroupVisibility('group-consumoAnnuale', v==='SWITCH_GAS');
-
       setGroupVisibility('group-offertaPrivatoLuce',  priv && (isLuceOnly || isDual));
       setGroupVisibility('group-offertaPrivatoGas',   priv && (isGasOnly  || isDual));
       setGroupVisibility('group-offertaBusLuce',     !priv && (isLuceOnly || isDual));
       setGroupVisibility('group-offertaBusGas',      !priv && (isGasOnly  || isDual));
     });
-    document.getElementById('metodoPag').addEventListener('change', e => {
-      setGroupVisibility('group-iban', e.target.value === 'IBAN');
-    });
-    const poss = document.getElementById('dataPossesso');
-    if(poss) poss.valueAsDate = new Date();
+    document.getElementById('metodoPag').addEventListener('change', e => { setGroupVisibility('group-iban', e.target.value === 'IBAN'); });
+    const poss = document.getElementById('dataPossesso'); if(poss) poss.valueAsDate = new Date();
 
-    /* ====================== SALVA BOZZA ======================= */
+    /* ====================== Bozza ====================== */
     const DRAFT_KEY = 'acea_portale_bozza_v1';
     const saveStatus = document.getElementById('saveStatus');
     function saveDraft(){
-      const data = {};
-      document.querySelectorAll('#wizardForm input, #wizardForm select, #wizardForm textarea').forEach(el=>{
-        data[el.id] = el.value;
-      });
+      const data = {}; document.querySelectorAll('#wizardForm input, #wizardForm select, #wizardForm textarea').forEach(el=>{ data[el.id] = el.value; });
       localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
-      const now = new Date();
-      const hh = String(now.getHours()).padStart(2,'0');
-      const mm = String(now.getMinutes()).padStart(2,'0');
+      const now = new Date(); const hh = String(now.getHours()).padStart(2,'0'); const mm = String(now.getMinutes()).padStart(2,'0');
       saveStatus.textContent = `Bozza salvata alle ${hh}:${mm}`;
     }
     function loadDraftObj(obj){
-      // set principali prima
-      ['tipoCliente','useSameAddress','tipoOp','metodoPag'].forEach(id=>{
-        if(obj[id] !== undefined && document.getElementById(id)){
-          document.getElementById(id).value = obj[id];
-        }
-      });
-      ['tipoCliente','useSameAddress','tipoOp','metodoPag'].forEach(id=>{
-        const el = document.getElementById(id);
-        if(el){ el.dispatchEvent(new Event('change')); }
-      });
-      // poi tutti gli altri
-      Object.keys(obj).forEach(id=>{
-        if(document.getElementById(id)){
-          document.getElementById(id).value = obj[id];
-        }
-      });
+      ['tipoCliente','useSameAddress','tipoOp','metodoPag'].forEach(id=>{ if(obj[id] !== undefined && document.getElementById(id)){ document.getElementById(id).value = obj[id]; }});
+      ['tipoCliente','useSameAddress','tipoOp','metodoPag'].forEach(id=>{ const el = document.getElementById(id); if(el){ el.dispatchEvent(new Event('change')); }});
+      Object.keys(obj).forEach(id=>{ if(document.getElementById(id)){ document.getElementById(id).value = obj[id]; }});
     }
-    function loadDraft(){
-      const raw = localStorage.getItem(DRAFT_KEY);
-      if(!raw) return;
-      try{
-        loadDraftObj(JSON.parse(raw));
-        saveStatus.textContent = 'Bozza caricata';
-      }catch(e){ console.warn('Errore caricamento bozza', e); }
-    }
-    function clearDraft(){
-      localStorage.removeItem(DRAFT_KEY);
-      saveStatus.textContent = 'Bozza cancellata';
-    }
+    function loadDraft(){ const raw = localStorage.getItem(DRAFT_KEY); if(!raw) return; try{ loadDraftObj(JSON.parse(raw)); saveStatus.textContent = 'Bozza caricata'; }catch(e){ console.warn('Errore bozza', e); } }
+    function clearDraft(){ localStorage.removeItem(DRAFT_KEY); saveStatus.textContent = 'Bozza cancellata'; }
     document.getElementById('wizardForm').addEventListener('input', saveDraft);
     document.getElementById('wizardForm').addEventListener('change', saveDraft);
     document.getElementById('btnSaveDraft').addEventListener('click', saveDraft);
-    document.getElementById('btnClearDraft').addEventListener('click', ()=>{
-      clearDraft();
-      alert('Bozza cancellata. (I dati a video restano finché non ricarichi o modifichi manualmente)');
-    });
+    document.getElementById('btnClearDraft').addEventListener('click', ()=>{ clearDraft(); alert('Bozza cancellata. (I dati a video restano finché non ricarichi o modifichi manualmente)'); });
 
-    /* ====================== STORICO PRATICHE (LOCALE) ======================= */
+    /* ====================== Storico pratiche ====================== */
     const PRACTICES_KEY = 'acea_portale_pratiche_v1';
     const historyCountEl = document.getElementById('historyCount');
-    function getPractices(){
-      try{ return JSON.parse(localStorage.getItem(PRACTICES_KEY) || '[]'); }
-      catch{ return []; }
-    }
-    function setPractices(arr){
-      localStorage.setItem(PRACTICES_KEY, JSON.stringify(arr));
-      updateHistoryCount();
-    }
+    function getPractices(){ try{ return JSON.parse(localStorage.getItem(PRACTICES_KEY) || '[]'); }catch{ return []; } }
+    function setPractices(arr){ localStorage.setItem(PRACTICES_KEY, JSON.stringify(arr)); updateHistoryCount(); }
     function updateHistoryCount(){ historyCountEl.textContent = getPractices().length; }
-    function toLocalDateTime(iso){
-      const d = new Date(iso);
-      const dd = String(d.getDate()).padStart(2,'0');
-      const mm = String(d.getMonth()+1).padStart(2,'0');
-      const yyyy = d.getFullYear();
-      const hh = String(d.getHours()).padStart(2,'0');
-      const mi = String(d.getMinutes()).padStart(2,'0');
-      return `${dd}/${mm}/${yyyy} ${hh}:${mi}`;
-    }
+    function toLocalDateTime(iso){ const d = new Date(iso); const pad=n=>String(n).padStart(2,'0'); return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`; }
+    function resolvedFornituraAddressFromFields(f){ return (f['useSameAddress']==='same') ? (f['indirizzo']||'') : (f['indirizzoForn']||''); }
+
     function savePractice(channel, message){
-      const fields = {};
-      document.querySelectorAll('#wizardForm input, #wizardForm select').forEach(el => fields[el.id] = el.value);
-      const tipo = fields['tipoCliente'];
-      const nominativo = (tipo === 'privato') ? fields['nome'] : fields['azienda'];
+      const fields = {}; document.querySelectorAll('#wizardForm input, #wizardForm select').forEach(el => fields[el.id] = el.value);
+      const tipo = fields['tipoCliente']; const nominativo = (tipo === 'privato') ? fields['nome'] : fields['azienda'];
       const practice = {
         id: Date.now().toString(36)+Math.random().toString(36).slice(2,7),
         created: new Date().toISOString(),
         channel,
+        verified: false,
         message,
         fields,
         tipoCliente: tipo,
@@ -678,12 +695,10 @@
         fornitoreUscenteLuce: fields['fornitoreUscenteLuce'] || '',
         fornitoreUscenteGas: fields['fornitoreUscenteGas'] || ''
       };
-      const list = getPractices();
-      list.unshift(practice);
-      setPractices(list);
-      return practice.id;
+      const list = getPractices(); list.unshift(practice); setPractices(list); return practice.id;
     }
-    // Modal controls
+
+    // UI Storico
     const modal = document.getElementById('historyModal');
     const tbody = document.getElementById('historyTbody');
     const searchInput = document.getElementById('historySearch');
@@ -691,122 +706,216 @@
 
     function renderHistory(){
       const q = (searchInput.value || '').toLowerCase();
-      const list = getPractices();
-      let shown = 0;
-      tbody.innerHTML = '';
+      const list = getPractices(); let shown = 0; tbody.innerHTML = '';
       list.forEach(p => {
-        const hay = [
-          p.cliente, p.operazione, p.indirizzoFornitura, p.codice, p.pod, p.pdr, p.metodoPag
-        ].join(' ').toLowerCase();
-        if(q && !hay.includes(q)) return;
-        shown++;
+        const hay = [p.cliente, p.operazione, p.indirizzoFornitura, p.codice, p.pod, p.pdr, p.metodoPag].join(' ').toLowerCase();
+        if(q && !hay.includes(q)) return; shown++;
         const tr = document.createElement('tr');
+        const stato = p.verified ? '<span class="badge badge-ok">Verificata</span>' : '<span class="badge">Da verificare</span>';
         tr.innerHTML = `
           <td>${toLocalDateTime(p.created)}</td>
-          <td><div><strong>${p.cliente || '-'}</strong></div><div class="muted">${p.codice || ''}</div></td>
-          <td>${p.operazione || '-'}</td>
-          <td>${p.indirizzoFornitura || '-'}</td>
-          <td><span class="badge">${p.channel}</span></td>
+          <td class="trunc" title="${(p.cliente||'-').replace(/"/g,'&quot;')}">
+            <div><strong>${p.cliente || '-'}</strong></div>
+            <div class="muted">${p.codice || ''}</div>
+          </td>
+          <td class="trunc" title="${(p.operazione||'-').replace(/"/g,'&quot;')}">${p.operazione || '-'}</td>
+          <td class="trunc" title="${(p.indirizzoFornitura||'-').replace(/"/g,'&quot;')}">${p.indirizzoFornitura || '-'}</td>
+          <td>${stato} <span class="badge">${p.channel}</span></td>
           <td class="td-actions">
+            <button type="button" class="link-btn" data-action="details" data-id="${p.id}">Dettagli</button>
             <button type="button" class="link-btn" data-action="copy" data-id="${p.id}">Copia testo</button>
-            <button type="button" class="link-btn" data-action="draft" data-id="${p.id}">Riprendi come bozza</button>
+            <button type="button" class="link-btn" data-action="draft" data-id="${p.id}">Riprendi bozza</button>
+            <button type="button" class="link-btn" data-action="togglev" data-id="${p.id}">${p.verified ? 'Segna non verif.' : 'Segna verificata'}</button>
             <button type="button" class="link-btn" data-action="delete" data-id="${p.id}">Elimina</button>
           </td>`;
         tbody.appendChild(tr);
       });
       historyHint.textContent = shown ? `${shown} pratiche mostrate` : 'Nessuna pratica';
     }
-    function openHistory(){
-      renderHistory();
-      modal.classList.add('show');
-      modal.setAttribute('aria-hidden','false');
-    }
-    function closeHistory(){
-      modal.classList.remove('show');
-      modal.setAttribute('aria-hidden','true');
-    }
+    function openHistory(){ renderHistory(); modal.classList.add('show'); modal.setAttribute('aria-hidden','false'); }
+    function closeHistory(){ modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); }
+
     document.getElementById('btnOpenHistory').addEventListener('click', openHistory);
     document.getElementById('btnCloseHistory').addEventListener('click', closeHistory);
     document.getElementById('btnCloseBottom').addEventListener('click', closeHistory);
     modal.addEventListener('click', e => { if(e.target === modal) closeHistory(); });
-    searchInput.addEventListener('input', renderHistory);
 
-    // Delegazione azioni tabella
-    tbody.addEventListener('click', async e => {
-      const btn = e.target.closest('button[data-action]');
-      if(!btn) return;
-      const id = btn.getAttribute('data-id');
-      const action = btn.getAttribute('data-action');
-      const list = getPractices();
-      const idx = list.findIndex(p => p.id === id);
-      if(idx === -1) return;
-
-      if(action === 'copy'){
-        try{
-          await navigator.clipboard.writeText(list[idx].message);
-          alert('Testo pratica copiato negli appunti.');
-        }catch{
-          // fallback
-          const ta = document.createElement('textarea');
-          ta.value = list[idx].message; document.body.appendChild(ta);
-          ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
-          alert('Testo pratica copiato (fallback).');
-        }
-      }
-      else if(action === 'draft'){
-        // carica i campi come bozza
-        const data = list[idx].fields || {};
-        localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
-        loadDraftObj(data);
-        closeHistory();
-        show(0);
-        saveStatus.textContent = 'Bozza caricata dallo storico';
-        window.scrollTo({ top: 0, behavior:'smooth' });
-      }
-      else if(action === 'delete'){
-        if(confirm('Eliminare questa pratica dallo storico?')){
-          list.splice(idx,1);
-          setPractices(list);
-          renderHistory();
-        }
+    // Chiusura affidabile anche da tastiera (ESC) e con delegation
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === 'Escape'){
+        if(document.getElementById('detailModal').classList.contains('show')) closeDetails();
+        else if(modal.classList.contains('show')) closeHistory();
       }
     });
 
-    // Esporta CSV
-    document.getElementById('btnExportCSV').addEventListener('click', () => {
+    /* ===== Dettagli/Verifica ===== */
+    const detailModal = document.getElementById('detailModal');
+    const detailTitle = document.getElementById('detailTitle');
+    const detailMeta = document.getElementById('detailMeta');
+    const detailMessage = document.getElementById('detailMessage');
+    const summaryBlocks = document.getElementById('summaryBlocks');
+    const diffTableBody = document.querySelector('#diffTable tbody');
+    const btnToggleVerified = document.getElementById('btnToggleVerified');
+    let currentDetailId = null;
+
+    const LABELS = {
+      tipoCliente:"Tipo Cliente", nome:"Nome e Cognome", azienda:"Ragione Sociale", codice:"Codice Fiscale/Partita IVA",
+      legaleRapp:"Legale Rappresentante", codiceLegale:"CF Legale Rappresentante", dataNascita:"Data di Nascita",
+      luogoNascita:"Luogo di Nascita", indirizzo:"Indirizzo", telefono:"Telefono", mail:"Mail",
+      tipoDoc:"Documento", numeroDoc:"Numero Documento", dataRilascio:"Data Rilascio", dataScadenza:"Data Scadenza",
+      rilasciatoDa:"Rilasciato da", useSameAddress:"Stesso indirizzo Anagrafica?", indirizzoForn:"Indirizzo Fornitura (specifico)",
+      tipoOp:"Tipo Operazione", pod:"POD", pdr:"PDR", fornitoreUscenteLuce:"Fornitore Uscente Luce",
+      fornitoreUscenteGas:"Fornitore Uscente Gas", matricola:"Matricola", titoloOcc:"Titolo Occupazionale",
+      dataPossesso:"Data Possesso", consumoAnnuale:"Consumo Annuale", offertaPrivatoLuce:"Offerta Luce (Privato)",
+      offertaPrivatoGas:"Offerta Gas (Privato)", offertaBusLuce:"Offerta Luce (Business)", offertaBusGas:"Offerta Gas (Business)",
+      metodoPag:"Metodo di Pagamento", iban:"IBAN"
+    };
+    const ORDER = {
+      ANAGRAFICA: ["tipoCliente","nome","azienda","codice","legaleRapp","codiceLegale","dataNascita","luogoNascita","indirizzo","telefono","mail","tipoDoc","numeroDoc","dataRilascio","dataScadenza","rilasciatoDa"],
+      FORNITURA: ["useSameAddress","indirizzoForn","tipoOp","pod","pdr","fornitoreUscenteLuce","fornitoreUscenteGas","matricola","titoloOcc","dataPossesso","consumoAnnuale","offertaPrivatoLuce","offertaPrivatoGas","offertaBusLuce","offertaBusGas"],
+      CHIUSURA: ["metodoPag","iban"]
+    };
+
+    function buildSummaryFromFields(fields){
+      summaryBlocks.innerHTML = '';
+      function addItem(k, v){ if(!v) return; const div = document.createElement('div'); div.className='kv-item'; div.innerHTML = `<div class="k">${LABELS[k]||k}</div><div class="v">${v}</div>`; summaryBlocks.appendChild(div); }
+      ORDER.ANAGRAFICA.forEach(k=> addItem(k, fields[k]));
+      addItem('IndirizzoFornitura', resolvedFornituraAddressFromFields(fields));
+      ORDER.FORNITURA.forEach(k=> addItem(k, fields[k]));
+      ORDER.CHIUSURA.forEach(k=> addItem(k, fields[k]));
+    }
+
+    function collectCurrentFields(){
+      const obj={}; document.querySelectorAll('#wizardForm input, #wizardForm select').forEach(el=> obj[el.id]=el.value ); return obj;
+    }
+
+    function buildDiff(practice){
+      diffTableBody.innerHTML='';
+      const sent = practice.fields || {};
+      const curr = collectCurrentFields();
+      const keys = new Set([...Object.keys(sent), ...Object.keys(curr)]);
+      keys.forEach(k=>{
+        const a = sent[k] ?? ''; const b = curr[k] ?? '';
+        const same = (a===b);
+        const tr = document.createElement('tr');
+        tr.className = same ? 'diff-same' : 'diff-diff';
+        const label = LABELS[k] || k;
+        tr.innerHTML = `<td>${label}</td><td>${a||'—'}</td><td>${b||'—'}</td><td>${same? 'Uguale' : 'Diverso'}</td>`;
+        diffTableBody.appendChild(tr);
+      });
+    }
+
+    function openDetails(id){
       const list = getPractices();
-      if(!list.length){ alert('Archivio vuoto.'); return; }
-      const headers = ['id','created','channel','tipoCliente','cliente','codice','operazione','indirizzoFornitura','metodoPag','iban','pod','pdr','fornitoreUscenteLuce','fornitoreUscenteGas'];
+      const p = list.find(x=>x.id===id); if(!p) return;
+      currentDetailId = id;
+      detailTitle.textContent = `🔎 Dettagli pratica – ${p.cliente || 'Cliente'} (${toLocalDateTime(p.created)})`;
+      const stato = p.verified ? 'Verificata' : 'Da verificare';
+      detailMeta.innerHTML = `<b>Canale:</b> ${p.channel} · <b>Stato:</b> ${stato} · <b>Operazione:</b> ${p.operazione || '-'} · <b>Indirizzo fornitura:</b> ${p.indirizzoFornitura || '-'}`;
+      detailMessage.textContent = p.message || '';
+      buildSummaryFromFields(p.fields||{});
+      buildDiff(p);
+      btnToggleVerified.textContent = p.verified ? '🚫 Segna non verificata' : '✔️ Segna come verificata';
+      switchTab('summary');
+      detailModal.classList.add('show'); detailModal.setAttribute('aria-hidden','false');
+    }
+    function closeDetails(){ detailModal.classList.remove('show'); detailModal.setAttribute('aria-hidden','true'); currentDetailId=null; }
+
+    // Tabs dettagli
+    const tabSummary = document.getElementById('tabSummary');
+    const tabDiff = document.getElementById('tabDiff');
+    const tabMessage = document.getElementById('tabMessage');
+    const panelSummary = document.getElementById('panelSummary');
+    const panelDiff = document.getElementById('panelDiff');
+    const panelMessage = document.getElementById('panelMessage');
+    function switchTab(name){
+      [tabSummary,tabDiff,tabMessage].forEach(b=>b.classList.remove('active'));
+      [panelSummary,panelDiff,panelMessage].forEach(p=>p.classList.add('hidden'));
+      if(name==='summary'){ tabSummary.classList.add('active'); panelSummary.classList.remove('hidden'); }
+      if(name==='diff'){ tabDiff.classList.add('active'); panelDiff.classList.remove('hidden'); }
+      if(name==='message'){ tabMessage.classList.add('active'); panelMessage.classList.remove('hidden'); }
+    }
+    tabSummary.addEventListener('click', ()=>switchTab('summary'));
+    tabDiff.addEventListener('click', ()=>switchTab('diff'));
+    tabMessage.addEventListener('click', ()=>switchTab('message'));
+
+    // Copy riepilogo / messaggio
+    function summaryAsText(){
+      const fields = (getPractices().find(p=>p.id===currentDetailId)||{}).fields || {};
+      const mk = (k)=> LABELS[k]||k;
+      const lines = [];
+      lines.push('— ANAGRAFICA —');
+      ORDER.ANAGRAFICA.forEach(k=>{ if(fields[k]) lines.push(`${mk(k)}: ${fields[k]}`); });
+      const indF = resolvedFornituraAddressFromFields(fields); if(indF) lines.push(`Indirizzo Fornitura: ${indF}`);
+      lines.push('\n— FORNITURA —');
+      ORDER.FORNITURA.forEach(k=>{ if(fields[k]) lines.push(`${mk(k)}: ${fields[k]}`); });
+      lines.push('\n— PAGAMENTO —');
+      ORDER.CHIUSURA.forEach(k=>{ if(fields[k]) lines.push(`${mk(k)}: ${fields[k]}`); });
+      return lines.join('\n');
+    }
+    async function copyText(text){
+      try{ await navigator.clipboard.writeText(text); alert('Copiato negli appunti.'); }
+      catch{
+        const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta);
+        ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+        alert('Copiato (fallback).');
+      }
+    }
+    document.getElementById('btnCopySummary').addEventListener('click', ()=>{ copyText(summaryAsText()); });
+    document.getElementById('btnCopyMessage').addEventListener('click', ()=>{
+      const p = getPractices().find(x=>x.id===currentDetailId); if(!p) return; copyText(p.message||'');
+    });
+
+    // Toggle verified
+    document.getElementById('btnToggleVerified').addEventListener('click', ()=>{
+      if(!currentDetailId) return;
+      const list = getPractices(); const idx = list.findIndex(p=>p.id===currentDetailId); if(idx<0) return;
+      list[idx].verified = !list[idx].verified; setPractices(list);
+      document.getElementById('btnToggleVerified').textContent = list[idx].verified ? '🚫 Segna non verificata' : '✔️ Segna come verificata';
+      renderHistory();
+      const stato = list[idx].verified ? 'Verificata' : 'Da verificare';
+      detailMeta.innerHTML = `<b>Canale:</b> ${list[idx].channel} · <b>Stato:</b> ${stato} · <b>Operazione:</b> ${list[idx].operazione || '-'} · <b>Indirizzo fornitura:</b> ${list[idx].indirizzoFornitura || '-'}`;
+    });
+
+    // Delegazione azioni tabella storico
+    tbody.addEventListener('click', async e => {
+      const btn = e.target.closest('button[data-action]'); if(!btn) return;
+      const id = btn.getAttribute('data-id'); const action = btn.getAttribute('data-action');
+      const list = getPractices(); const idx = list.findIndex(p => p.id === id); if(idx === -1) return;
+
+      if(action === 'copy'){
+        await copyText(list[idx].message || '');
+      } else if(action === 'draft'){
+        const data = list[idx].fields || {}; localStorage.setItem(DRAFT_KEY, JSON.stringify(data)); loadDraftObj(data);
+        closeHistory(); show(0); saveStatus.textContent = 'Bozza caricata dallo storico'; window.scrollTo({ top: 0, behavior:'smooth' });
+      } else if(action === 'delete'){
+        if(confirm('Eliminare questa pratica dallo storico?')){ list.splice(idx,1); setPractices(list); renderHistory(); }
+      } else if(action === 'togglev'){
+        list[idx].verified = !list[idx].verified; setPractices(list); renderHistory();
+      } else if(action === 'details'){
+        openDetails(id);
+      }
+    });
+
+    // Esporta CSV / Svuota archivio
+    document.getElementById('btnExportCSV').addEventListener('click', () => {
+      const list = getPractices(); if(!list.length){ alert('Archivio vuoto.'); return; }
+      const headers = ['id','created','channel','verified','tipoCliente','cliente','codice','operazione','indirizzoFornitura','metodoPag','iban','pod','pdr','fornitoreUscenteLuce','fornitoreUscenteGas'];
       const rows = [headers.join(';')];
       list.forEach(p=>{
-        const row = headers.map(h=>{
-          let v = (p[h] ?? '').toString().replace(/[\r\n]+/g,' ').replace(/;/g, ',');
-          return `"${v}"`;
-        }).join(';');
+        const row = headers.map(h=> `"${(p[h] ?? '').toString().replace(/[\r\n]+/g,' ').replace(/;/g, ',')}"`).join(';');
         rows.push(row);
       });
       const blob = new Blob([rows.join('\n')], {type:'text/csv;charset=utf-8;'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      const now = new Date();
-      const stamp = now.toISOString().replace(/[:.]/g,'-');
-      a.download = `storico_pratiche_${stamp}.csv`;
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+      a.download = `storico_pratiche_${new Date().toISOString().replace(/[:.]/g,'-')}.csv`; document.body.appendChild(a); a.click(); document.body.removeChild(a);
     });
+    document.getElementById('btnClearHistory').addEventListener('click', ()=>{ if(confirm('Svuotare completamente lo storico pratiche?')){ setPractices([]); renderHistory(); } });
 
-    // Svuota archivio
-    document.getElementById('btnClearHistory').addEventListener('click', ()=>{
-      if(confirm('Svuotare completamente lo storico pratiche?')){
-        setPractices([]);
-        renderHistory();
-      }
-    });
-
-    /* ====================== INVIO (SALVA + WHATSAPP/MAIL) ======================= */
+    /* ====================== Invio (salva + invia) ====================== */
     document.getElementById('btnSendWhatsApp').onclick = () => {
       if(!validateAll()) return;
-      const text = buildMessage();
-      savePractice('whatsapp', text);
+      const text = buildMessage(); savePractice('whatsapp', text);
       window.open(`https://wa.me/393701357100?text=${encodeURIComponent(text)}`,'_blank');
     };
     document.getElementById('btnSendMail').onclick = () => {
@@ -819,19 +928,20 @@
       window.location.href = `mailto:mario.isernia@e2kdistribution.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`;
     };
 
-    /* ====================== AVVIO ======================= */
+    /* ====================== Avvio ====================== */
     document.addEventListener('DOMContentLoaded', () => {
       updateHistoryCount();
       const raw = localStorage.getItem(DRAFT_KEY);
-      if(raw){
-        loadDraft();
-      }else{
+      if(raw){ loadDraft(); }
+      else{
         const sel = document.getElementById('useSameAddress');
-        if(sel){
-          sel.selectedIndex = 0;
-          sel.dispatchEvent(new Event('change'));
-        }
+        if(sel){ sel.selectedIndex = 0; sel.dispatchEvent(new Event('change')); }
       }
+      // Chiudi modali con X anche se in futuro venissero ricreati (delegation)
+      document.addEventListener('click', (e)=>{
+        if(e.target.id === 'btnCloseDetail' || e.target.closest('#btnCloseDetail')) closeDetails();
+        if(e.target.id === 'btnCloseHistory' || e.target.closest('#btnCloseHistory')) closeHistory();
+      });
     });
   </script>
 </body>
