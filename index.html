@@ -26,7 +26,7 @@
       position:relative; width:100%; max-width: 1000px;
       background:var(--card); border-radius:14px;
       box-shadow:0 8px 24px rgba(0,0,0,.08);
-      padding:88px 28px 28px; /* più spazio per la toolbar */
+      padding:88px 28px 28px;
     }
     .header{
       position:absolute; inset:0 0 auto 0; height:64px;
@@ -38,13 +38,9 @@
       display:flex; align-items:center; justify-content:space-between; color:#fff;
       font-weight:600; gap:12px;
     }
-    .title h1{
-      margin:0; font-size:1.25rem; line-height:1.1;
-    }
+    .title h1{ margin:0; font-size:1.25rem; line-height:1.1; }
     .title small{ opacity:.95; font-weight:500; white-space:nowrap }
-    .title-right{
-      display:flex; align-items:center; gap:8px; flex-wrap:nowrap;
-    }
+    .title-right{ display:flex; align-items:center; gap:8px; flex-wrap:nowrap; }
     .link-btn{
       background:transparent; color:#fff; border:1px solid rgba(255,255,255,.4);
       border-radius:10px; padding:8px 12px; cursor:pointer; font-size:.9rem;
@@ -59,12 +55,8 @@
       .title{ top:6px; left:10px; right:10px; flex-direction:column; align-items:flex-start; gap:6px; }
       .title h1{ font-size:1.05rem; }
       .title-right{
-        width:100%;
-        overflow-x:auto;
-        -webkit-overflow-scrolling:touch;
-        scrollbar-width:none;
-        gap:8px;
-        padding-bottom:4px;
+        width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch;
+        scrollbar-width:none; gap:8px; padding-bottom:4px;
       }
       .title-right::-webkit-scrollbar{ display:none; }
       .link-btn{ padding:8px 10px; font-size:.9rem; }
@@ -116,12 +108,7 @@
     .modal-title{ font-weight:700; color:#333 }
     .close-x{ background:transparent; border:1px solid #dfe7e9; font-size:18px; cursor:pointer; width:36px; height:32px; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; }
 
-    /* Pulsanti nei modali (ben visibili su fondo chiaro) */
-    .modal .link-btn{
-      color:#0b3d3c;
-      border-color:#cfe7e6;
-      background:#f6fcfc;
-    }
+    .modal .link-btn{ color:#0b3d3c; border-color:#cfe7e6; background:#f6fcfc; }
     .modal .link-btn:hover{ background:#e9f7f6; }
 
     /* ===== Storico tabella ===== */
@@ -136,7 +123,6 @@
     .badge-ok{ background:#eafaf0; color:#187a3c; border-color:#cdebd6; }
     .muted{ color:#666; font-size:.88rem; }
 
-    /* Vista compatta e consultabile */
     .table-compact thead th{ padding:8px; }
     .table-compact tbody td{ padding:6px 8px; font-size:.9rem; line-height:1.2; }
     .table-compact .td-actions .link-btn{ padding:4px 8px; font-size:.82rem; }
@@ -402,9 +388,9 @@
         </div>
       </div>
 
-      <!-- ========== 3) CHIUSURA ========== -->
+      <!-- ========== 3) PAGAMENTO ========== -->
       <div class="section" id="section-chiusura">
-        <h2>Chiusura e Invio Contratto</h2>
+        <h2>Pagamento e Invio Contratto</h2>
         <p class="help">Scegli il metodo di pagamento e invia i dati tramite WhatsApp o Mail.</p>
 
         <div class="grid cols-2">
@@ -511,6 +497,19 @@
   </div>
 
   <script>
+    /* ====================== Helpers generali ====================== */
+    const DATE_KEYS = new Set(['dataNascita','dataRilascio','dataScadenza','dataPossesso']);
+    function formatDateDMY(v){
+      if(!v) return '';
+      const [y,m,d] = v.split('-');
+      return (y && m && d) ? `${d.padStart(2,'0')}/${m.padStart(2,'0')}/${y}` : v;
+    }
+    function fmtValueForKey(key, value){
+      if(!value) return '';
+      if(DATE_KEYS.has(key)) return formatDateDMY(value);
+      return value;
+    }
+
     /* ====================== Utility visibilità ====================== */
     function setGroupVisibility(groupId, visible){
       const el = document.getElementById(groupId);
@@ -549,58 +548,58 @@
 
     /* ====================== Raccolta dati / messaggio ====================== */
     function collectVisibleLabeledData(){
-    const order = [
-      { id:'section-anagrafica', title:'ANAGRAFICA' },
-      { id:'section-fornitura',  title:'FORNITURA'  },
-      { id:'section-chiusura',   title:'PAGAMENTO'   }
-    ];
+      const order = [
+        { id:'section-anagrafica', title:'ANAGRAFICA' },
+        { id:'section-fornitura',  title:'FORNITURA'  },
+        { id:'section-chiusura',   title:'PAGAMENTO'  }
+      ];
 
-    const blocks = [];
+      const blocks = [];
 
-    order.forEach(sec => {
-      const groups = document.querySelectorAll(`#${sec.id} .form-group:not(.hidden)`);
-      const lines = [];
-      let fornituraAddressInserted = false;
+      order.forEach(sec => {
+        const groups = document.querySelectorAll(`#${sec.id} .form-group:not(.hidden)`);
+        const lines = [];
+        let fornituraAddressInserted = false;
 
-      groups.forEach(g => {
-        const labelEl = g.querySelector('label');
-        const ctrl = g.querySelector('input,select,textarea');
-        if(!ctrl) return;
+        groups.forEach(g => {
+          const labelEl = g.querySelector('label');
+          const ctrl = g.querySelector('input,select,textarea');
+          if(!ctrl) return;
 
-        // 🔧 Caso speciale: "Stesso indirizzo Anagrafica?"
-        // Non scrivere "Usa indirizzo anagrafica", ma la riga con l'indirizzo risolto
-        if (ctrl.id === 'useSameAddress') {
-          const addr = resolvedFornituraAddress(); // anagrafica o nuovo indirizzo
-          if (addr) {
-            lines.push(`Indirizzo Fornitura: ${addr}`);
-            fornituraAddressInserted = true;
+          // Caso speciale: "Stesso indirizzo Anagrafica?"
+          if (ctrl.id === 'useSameAddress') {
+            const addr = resolvedFornituraAddress();
+            if (addr) {
+              lines.push(`Indirizzo Fornitura: ${addr}`);
+              fornituraAddressInserted = true;
+            }
+            return; // non scrivere "Usa indirizzo anagrafica"
           }
-          return; // evitare di aggiungere la label "Stesso indirizzo Anagrafica?"
+
+          // Valore (formatta se data)
+          let value = '';
+          if (ctrl.tagName === 'SELECT') {
+            const opt = ctrl.options[ctrl.selectedIndex];
+            value = opt ? opt.text : '';
+          } else {
+            value = (ctrl.type === 'date') ? formatDateDMY(ctrl.value) : ctrl.value;
+          }
+
+          const lab = labelEl ? labelEl.innerText : (ctrl.id || 'Campo');
+          if (value !== '') lines.push(`${lab}: ${value}`);
+        });
+
+        // Fallback per indirizzo fornitura
+        if (sec.id === 'section-fornitura' && !fornituraAddressInserted) {
+          const addr = resolvedFornituraAddress();
+          if (addr) lines.push(`Indirizzo Fornitura: ${addr}`);
         }
 
-        // Altri campi: normale etichetta: valore
-        let value = '';
-        if (ctrl.tagName === 'SELECT') {
-          const opt = ctrl.options[ctrl.selectedIndex];
-          value = opt ? opt.text : '';
-        } else {
-          value = ctrl.value;
-        }
-        const lab = labelEl ? labelEl.innerText : (ctrl.id || 'Campo');
-        if (value !== '') lines.push(`${lab}: ${value}`);
+        if (lines.length) blocks.push(`— ${sec.title} —\n${lines.join('\n')}`);
       });
 
-      // Fallback di sicurezza (se per qualche motivo non è entrato sopra)
-      if (sec.id === 'section-fornitura' && !fornituraAddressInserted) {
-        const addr = resolvedFornituraAddress();
-        if (addr) lines.push(`Indirizzo Fornitura: ${addr}`);
-      }
-
-      if (lines.length) blocks.push(`— ${sec.title} —\n${lines.join('\n')}`);
-    });
-
-    return blocks.join('\n\n');
-  }
+      return blocks.join('\n\n');
+    }
     function buildMessage(){ const body = collectVisibleLabeledData(); return `Ciao!\nTi chiedo di inserire questa pratica e darmi conferma inserimento:\n\n${body}\n\nGrazie per il supporto`; }
     function resolvedFornituraAddress(){ const same = document.getElementById('useSameAddress').value === 'same'; return same ? document.getElementById('indirizzo').value : document.getElementById('indirizzoForn').value; }
 
@@ -734,19 +733,11 @@
     }
     function openHistory(){ renderHistory(); modal.classList.add('show'); modal.setAttribute('aria-hidden','false'); }
     function closeHistory(){ modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); }
-
     document.getElementById('btnOpenHistory').addEventListener('click', openHistory);
     document.getElementById('btnCloseHistory').addEventListener('click', closeHistory);
     document.getElementById('btnCloseBottom').addEventListener('click', closeHistory);
     modal.addEventListener('click', e => { if(e.target === modal) closeHistory(); });
-
-    // Chiusura affidabile anche da tastiera (ESC) e con delegation
-    document.addEventListener('keydown', (e)=>{
-      if(e.key === 'Escape'){
-        if(document.getElementById('detailModal').classList.contains('show')) closeDetails();
-        else if(modal.classList.contains('show')) closeHistory();
-      }
-    });
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ if(document.getElementById('detailModal').classList.contains('show')) closeDetails(); else if(modal.classList.contains('show')) closeHistory(); } });
 
     /* ===== Dettagli/Verifica ===== */
     const detailModal = document.getElementById('detailModal');
@@ -778,7 +769,7 @@
 
     function buildSummaryFromFields(fields){
       summaryBlocks.innerHTML = '';
-      function addItem(k, v){ if(!v) return; const div = document.createElement('div'); div.className='kv-item'; div.innerHTML = `<div class="k">${LABELS[k]||k}</div><div class="v">${v}</div>`; summaryBlocks.appendChild(div); }
+      function addItem(k, v){ if(!v) return; const div = document.createElement('div'); div.className='kv-item'; div.innerHTML = `<div class="k">${LABELS[k]||k}</div><div class="v">${fmtValueForKey(k,v)}</div>`; summaryBlocks.appendChild(div); }
       ORDER.ANAGRAFICA.forEach(k=> addItem(k, fields[k]));
       addItem('IndirizzoFornitura', resolvedFornituraAddressFromFields(fields));
       ORDER.FORNITURA.forEach(k=> addItem(k, fields[k]));
@@ -800,7 +791,7 @@
         const tr = document.createElement('tr');
         tr.className = same ? 'diff-same' : 'diff-diff';
         const label = LABELS[k] || k;
-        tr.innerHTML = `<td>${label}</td><td>${a||'—'}</td><td>${b||'—'}</td><td>${same? 'Uguale' : 'Diverso'}</td>`;
+        tr.innerHTML = `<td>${label}</td><td>${fmtValueForKey(k,a)||'—'}</td><td>${fmtValueForKey(k,b)||'—'}</td><td>${same? 'Uguale' : 'Diverso'}</td>`;
         diffTableBody.appendChild(tr);
       });
     }
@@ -839,18 +830,18 @@
     tabDiff.addEventListener('click', ()=>switchTab('diff'));
     tabMessage.addEventListener('click', ()=>switchTab('message'));
 
-    // Copy riepilogo / messaggio
+    // Copy riepilogo / messaggio (con date formattate)
     function summaryAsText(){
       const fields = (getPractices().find(p=>p.id===currentDetailId)||{}).fields || {};
       const mk = (k)=> LABELS[k]||k;
       const lines = [];
       lines.push('— ANAGRAFICA —');
-      ORDER.ANAGRAFICA.forEach(k=>{ if(fields[k]) lines.push(`${mk(k)}: ${fields[k]}`); });
+      ORDER.ANAGRAFICA.forEach(k=>{ if(fields[k]) lines.push(`${mk(k)}: ${fmtValueForKey(k, fields[k])}`); });
       const indF = resolvedFornituraAddressFromFields(fields); if(indF) lines.push(`Indirizzo Fornitura: ${indF}`);
       lines.push('\n— FORNITURA —');
-      ORDER.FORNITURA.forEach(k=>{ if(fields[k]) lines.push(`${mk(k)}: ${fields[k]}`); });
+      ORDER.FORNITURA.forEach(k=>{ if(fields[k]) lines.push(`${mk(k)}: ${fmtValueForKey(k, fields[k])}`); });
       lines.push('\n— PAGAMENTO —');
-      ORDER.CHIUSURA.forEach(k=>{ if(fields[k]) lines.push(`${mk(k)}: ${fields[k]}`); });
+      ORDER.CHIUSURA.forEach(k=>{ if(fields[k]) lines.push(`${mk(k)}: ${fmtValueForKey(k, fields[k])}`); });
       return lines.join('\n');
     }
     async function copyText(text){
@@ -937,7 +928,6 @@
         const sel = document.getElementById('useSameAddress');
         if(sel){ sel.selectedIndex = 0; sel.dispatchEvent(new Event('change')); }
       }
-      // Chiudi modali con X anche se in futuro venissero ricreati (delegation)
       document.addEventListener('click', (e)=>{
         if(e.target.id === 'btnCloseDetail' || e.target.closest('#btnCloseDetail')) closeDetails();
         if(e.target.id === 'btnCloseHistory' || e.target.closest('#btnCloseHistory')) closeHistory();
@@ -946,3 +936,4 @@
   </script>
 </body>
 </html>
+
