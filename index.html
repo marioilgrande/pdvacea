@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Portale Inserimento Contratti ACEA</title>
+  <title>Portale (provvisorio) Inserimento Contratti ACEA</title>
   <style>
     :root{
       --acea-green:#0ABAB5;
@@ -49,7 +49,6 @@
     .link-btn:hover{ background: rgba(255,255,255,.15); }
     #saveStatus{ font-size:.85rem; opacity:.95 }
 
-    /* Toolbar responsive per smartphone */
     @media (max-width: 640px){
       .container{ padding:112px 12px 16px; }
       .title{ top:6px; left:10px; right:10px; flex-direction:column; align-items:flex-start; gap:6px; }
@@ -98,7 +97,6 @@
     }
     .hint{ font-size:.85rem; color:#667; margin-top:4px }
 
-    /* ===== Modali (base) ===== */
     .modal{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,.45); padding:20px; z-index:1000; }
     .modal.show{ display:flex; }
     .modal-card{ background:#fff; border-radius:12px; width:100%; max-width:1000px; max-height:85vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 18px 32px rgba(0,0,0,.2);}
@@ -111,7 +109,6 @@
     .modal .link-btn{ color:#0b3d3c; border-color:#cfe7e6; background:#f6fcfc; }
     .modal .link-btn:hover{ background:#e9f7f6; }
 
-    /* ===== Storico tabella ===== */
     .toolbar{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
     .toolbar input{ padding:10px; border:1px solid #e3e5e8; border-radius:8px; min-width:220px; }
     .table-wrap{ max-height:60vh; overflow:auto; }
@@ -131,7 +128,6 @@
     td.trunc{ max-width:260px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     @media (max-width:640px){ td.trunc{ max-width:160px; } }
 
-    /* ===== Modal Dettagli ===== */
     .tabs{ display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
     .tab-btn{ border:1px solid #e3e5e8; background:#fff; color:#333; padding:8px 12px; border-radius:8px; cursor:pointer; }
     .tab-btn.active{ background:#eef6f6; border-color:#bfe8e6; color:#055; }
@@ -151,7 +147,7 @@
   <div class="container">
     <div class="header"></div>
     <div class="title">
-      <h1>Portale Inserimento Contratti ACEA</h1>
+      <h1>Portale (provvisorio) Inserimento Contratti ACEA</h1>
       <div class="title-right" aria-label="Strumenti">
         <small id="saveStatus">Bozza non salvata</small>
         <button type="button" class="link-btn" id="btnSaveDraft">💾 Salva bozza</button>
@@ -163,7 +159,6 @@
 
     <form id="wizardForm" onsubmit="return false;">
 
-      <!-- ========== 1) ANAGRAFICA ========== -->
       <div class="section active" id="section-anagrafica">
         <h2>Anagrafica</h2>
         <p class="help">Compila i dati anagrafici del cliente. Se selezioni <b>Business</b>, compariranno i campi aziendali.</p>
@@ -179,11 +174,16 @@
           </div>
 
           <div class="form-group" id="group-nome">
-            <label id="label-nome" for="nome">Nome e Cognome</label>
+            <label id="label-nome" for="nome">Nome</label>
             <input type="text" id="nome" required>
           </div>
 
-          <div class="form-group hidden" id="group-azienda">
+          <div class="form-group" id="group-cognome">
+            <label for="cognome">Cognome</label>
+            <input type="text" id="cognome" required>
+          </div>
+
+          <div class="form-group hidden full" id="group-azienda">
             <label for="azienda">Ragione Sociale</label>
             <input type="text" id="azienda" required>
           </div>
@@ -264,7 +264,6 @@
         </div>
       </div>
 
-      <!-- ========== 2) FORNITURA ========== -->
       <div class="section" id="section-fornitura">
         <h2>Fornitura</h2>
         <p class="help">Indica i dettagli della fornitura e dell’operazione.</p>
@@ -296,6 +295,8 @@
               <option value="SUBENTRO_DUAL_LUCE_A01">SUBENTRO DUAL LUCE &gt; A01</option>
               <option value="SUBENTRO_GAS_A40">SUBENTRO GAS A40</option>
               <option value="SWITCH_VOLTURA_LUCE">SWITCH CON VOLTURA LUCE</option>
+              <option value="VOLTURA_LUCE_ACEA">VOLTURA LUCE (CLIENTE ACEA)</option>
+              <option value="VOLTURA_GAS_ACEA">VOLTURA GAS (CLIENTE ACEA)</option>
             </select>
           </div>
 
@@ -344,7 +345,6 @@
             <input type="number" id="consumoAnnuale" required>
           </div>
 
-          <!-- Offerte dinamiche -->
           <div class="form-group hidden" id="group-offertaPrivatoLuce">
             <label for="offertaPrivatoLuce">Offerta Luce (Privato)</label>
             <select id="offertaPrivatoLuce" required>
@@ -388,7 +388,6 @@
         </div>
       </div>
 
-      <!-- ========== 3) PAGAMENTO ========== -->
       <div class="section" id="section-chiusura">
         <h2>Pagamento e Invio Contratto</h2>
         <p class="help">Scegli il metodo di pagamento e invia i dati tramite WhatsApp o Mail.</p>
@@ -420,7 +419,6 @@
     </form>
   </div>
 
-  <!-- ===== Modal Storico Pratiche ===== -->
   <div class="modal" id="historyModal" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal-card">
       <div class="modal-header" style="display:flex;justify-content:space-between;align-items:center;">
@@ -456,7 +454,6 @@
     </div>
   </div>
 
-  <!-- ===== Modal Dettagli/Verifica Pratica ===== -->
   <div class="modal" id="detailModal" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal-card">
       <div class="modal-header" style="display:flex;justify-content:space-between;align-items:center;">
@@ -491,13 +488,12 @@
         <button type="button" class="link-btn" id="btnCopySummary">Copia riepilogo</button>
         <button type="button" class="link-btn" id="btnCopyMessage">Copia testo inviato</button>
         <span style="flex:1"></span>
-        <button type="button" class="btn btn-secondary" id="btnToggleVerified">✔️ Segna come verificata</button>
+        <button type="button" class="btn btn-secondary" id="btnToggleVerified">✔️ Segna come inserita</button>
       </div>
     </div>
   </div>
 
   <script>
-    /* ====================== Helpers generali ====================== */
     const DATE_KEYS = new Set(['dataNascita','dataRilascio','dataScadenza','dataPossesso']);
     function formatDateDMY(v){
       if(!v) return '';
@@ -510,7 +506,6 @@
       return value;
     }
 
-    /* ====================== Utility visibilità ====================== */
     function setGroupVisibility(groupId, visible){
       const el = document.getElementById(groupId);
       if(!el) return;
@@ -526,27 +521,44 @@
       });
     }
 
-    /* ====================== Navigazione ====================== */
+    function getFullPrivateName(){
+      const nome = (document.getElementById('nome')?.value || '').trim();
+      const cognome = (document.getElementById('cognome')?.value || '').trim();
+      return [nome, cognome].filter(Boolean).join(' ');
+    }
+
     const sections = [...document.querySelectorAll('.section')];
     const progress = document.getElementById('progressBar');
     const PROG = ['33.333%','66.666%','100%'];
     let currentStep = 0;
-    const show = i => { sections.forEach((s, idx) => s.classList.toggle('active', idx === i)); progress.style.width = PROG[i] || '33.333%'; currentStep=i; window.scrollTo({ top:0, behavior:'smooth' }); };
+    const show = i => {
+      sections.forEach((s, idx) => s.classList.toggle('active', idx === i));
+      progress.style.width = PROG[i] || '33.333%';
+      currentStep=i;
+      window.scrollTo({ top:0, behavior:'smooth' });
+    };
 
-    /* ====================== Validazione ====================== */
     function validateSection(sectionId){
       const container = document.getElementById(sectionId);
       const fields = container.querySelectorAll('.form-group:not(.hidden) input, .form-group:not(.hidden) select, .form-group:not(.hidden) textarea');
       for(const f of fields){
         if(f.disabled) continue;
         const isEmpty = (f.tagName === 'SELECT') ? (f.value === '' || f.selectedIndex === 0) : (f.value.trim() === '');
-        if(isEmpty){ const label = (f.closest('.form-group')?.querySelector('label')?.innerText || f.id); alert(`Compila il campo: ${label}`); f.focus(); return false; }
+        if(isEmpty){
+          const label = (f.closest('.form-group')?.querySelector('label')?.innerText || f.id);
+          alert(`Compila il campo: ${label}`);
+          f.focus();
+          return false;
+        }
       }
       return true;
     }
-    function validateAll(){ return validateSection('section-anagrafica') && validateSection('section-fornitura') && validateSection('section-chiusura'); }
+    function validateAll(){
+      return validateSection('section-anagrafica') &&
+             validateSection('section-fornitura') &&
+             validateSection('section-chiusura');
+    }
 
-    /* ====================== Raccolta dati / messaggio ====================== */
     function collectVisibleLabeledData(){
       const order = [
         { id:'section-anagrafica', title:'ANAGRAFICA' },
@@ -566,17 +578,15 @@
           const ctrl = g.querySelector('input,select,textarea');
           if(!ctrl) return;
 
-          // Caso speciale: "Stesso indirizzo Anagrafica?"
           if (ctrl.id === 'useSameAddress') {
             const addr = resolvedFornituraAddress();
             if (addr) {
               lines.push(`Indirizzo Fornitura: ${addr}`);
               fornituraAddressInserted = true;
             }
-            return; // non scrivere "Usa indirizzo anagrafica"
+            return;
           }
 
-          // Valore (formatta se data)
           let value = '';
           if (ctrl.tagName === 'SELECT') {
             const opt = ctrl.options[ctrl.selectedIndex];
@@ -589,7 +599,6 @@
           if (value !== '') lines.push(`${lab}: ${value}`);
         });
 
-        // Fallback per indirizzo fornitura
         if (sec.id === 'section-fornitura' && !fornituraAddressInserted) {
           const addr = resolvedFornituraAddress();
           if (addr) lines.push(`Indirizzo Fornitura: ${addr}`);
@@ -600,32 +609,53 @@
 
       return blocks.join('\n\n');
     }
-    function buildMessage(){ const body = collectVisibleLabeledData(); return `Ciao!\nTi chiedo di inserire questa pratica e darmi conferma inserimento:\n\n${body}\n\nGrazie per il supporto`; }
-    function resolvedFornituraAddress(){ const same = document.getElementById('useSameAddress').value === 'same'; return same ? document.getElementById('indirizzo').value : document.getElementById('indirizzoForn').value; }
 
-    /* ====================== Nav buttons ====================== */
-    document.getElementById('next1').onclick = () => { if(validateSection('section-anagrafica')) show(1); };
+    function buildMessage(){
+      const body = collectVisibleLabeledData();
+      return `Ciao!\nTi chiedo di inserire questa pratica e darmi conferma inserimento:\n\n${body}\n\nGrazie per il supporto`;
+    }
+
+    function resolvedFornituraAddress(){
+      const same = document.getElementById('useSameAddress').value === 'same';
+      return same ? document.getElementById('indirizzo').value : document.getElementById('indirizzoForn').value;
+    }
+
+    document.getElementById('next1').onclick = () => {
+      if(validateSection('section-anagrafica')) show(1);
+    };
     document.getElementById('back2').onclick = () => show(0);
-    document.getElementById('next2').onclick = () => { if(validateSection('section-fornitura')) show(2); };
+    document.getElementById('next2').onclick = () => {
+      if(validateSection('section-fornitura')) show(2);
+    };
     document.getElementById('back3').onclick = () => show(1);
 
-    /* ====================== Logiche dinamiche ====================== */
     document.getElementById('tipoCliente').addEventListener('change', e => {
       const priv = e.target.value === 'privato';
       setGroupVisibility('group-nome', priv);
+      setGroupVisibility('group-cognome', priv);
       setGroupVisibility('group-azienda', !priv);
       setGroupVisibility('group-legaleRapp', !priv);
       setGroupVisibility('group-codiceLegale', !priv);
-      document.getElementById('label-nome').textContent = priv ? 'Nome e Cognome' : 'Ragione Sociale';
+      document.getElementById('label-nome').textContent = priv ? 'Nome' : 'Ragione Sociale';
       document.getElementById('label-codice').textContent = priv ? 'Codice Fiscale' : 'Partita IVA';
     });
-    document.getElementById('useSameAddress').addEventListener('change', e => { setGroupVisibility('group-indirizzoNew', e.target.value === 'new'); });
+
+    document.getElementById('useSameAddress').addEventListener('change', e => {
+      setGroupVisibility('group-indirizzoNew', e.target.value === 'new');
+    });
+
     document.getElementById('tipoOp').addEventListener('change', function(){
       const v = this.value;
       const priv = document.getElementById('tipoCliente').value === 'privato';
-      const isDual = v.includes('DUAL'); const isSwitch = v.startsWith('SWITCH');
-      const isLuceOnly = v.includes('LUCE') && !isDual; const isGasOnly  = v.includes('GAS')  && !isDual;
-      const isSubGas = v==='SUBENTRO_GAS_A01' || v==='SUBENTRO_GAS_A40'; const isSubOrVolt= v.startsWith('SUBENTRO') || v==='SWITCH_VOLTURA_LUCE';
+
+      const isDual = v.includes('DUAL');
+      const isSwitch = v.startsWith('SWITCH');
+      const isLuceOnly = v.includes('LUCE') && !isDual;
+      const isGasOnly  = v.includes('GAS')  && !isDual;
+      const isSubGas = v==='SUBENTRO_GAS_A01' || v==='SUBENTRO_GAS_A40';
+      const isVolturaLike = v==='SWITCH_VOLTURA_LUCE' || v==='VOLTURA_LUCE_ACEA' || v==='VOLTURA_GAS_ACEA';
+      const isSubOrVolt = v.startsWith('SUBENTRO') || isVolturaLike;
+
       setGroupVisibility('group-pod', (isLuceOnly || isDual));
       setGroupVisibility('group-pdr', (isGasOnly  || isDual));
       setGroupVisibility('group-fornLuce', (isSwitch && (isLuceOnly || isDual)));
@@ -639,42 +669,108 @@
       setGroupVisibility('group-offertaBusLuce',     !priv && (isLuceOnly || isDual));
       setGroupVisibility('group-offertaBusGas',      !priv && (isGasOnly  || isDual));
     });
-    document.getElementById('metodoPag').addEventListener('change', e => { setGroupVisibility('group-iban', e.target.value === 'IBAN'); });
-    const poss = document.getElementById('dataPossesso'); if(poss) poss.valueAsDate = new Date();
 
-    /* ====================== Bozza ====================== */
+    document.getElementById('metodoPag').addEventListener('change', e => {
+      setGroupVisibility('group-iban', e.target.value === 'IBAN');
+    });
+
+    const poss = document.getElementById('dataPossesso');
+    if(poss) poss.valueAsDate = new Date();
+
     const DRAFT_KEY = 'acea_portale_bozza_v1';
     const saveStatus = document.getElementById('saveStatus');
+
     function saveDraft(){
-      const data = {}; document.querySelectorAll('#wizardForm input, #wizardForm select, #wizardForm textarea').forEach(el=>{ data[el.id] = el.value; });
+      const data = {};
+      document.querySelectorAll('#wizardForm input, #wizardForm select, #wizardForm textarea').forEach(el=>{
+        data[el.id] = el.value;
+      });
       localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
-      const now = new Date(); const hh = String(now.getHours()).padStart(2,'0'); const mm = String(now.getMinutes()).padStart(2,'0');
+      const now = new Date();
+      const hh = String(now.getHours()).padStart(2,'0');
+      const mm = String(now.getMinutes()).padStart(2,'0');
       saveStatus.textContent = `Bozza salvata alle ${hh}:${mm}`;
     }
+
     function loadDraftObj(obj){
-      ['tipoCliente','useSameAddress','tipoOp','metodoPag'].forEach(id=>{ if(obj[id] !== undefined && document.getElementById(id)){ document.getElementById(id).value = obj[id]; }});
-      ['tipoCliente','useSameAddress','tipoOp','metodoPag'].forEach(id=>{ const el = document.getElementById(id); if(el){ el.dispatchEvent(new Event('change')); }});
-      Object.keys(obj).forEach(id=>{ if(document.getElementById(id)){ document.getElementById(id).value = obj[id]; }});
+      ['tipoCliente','useSameAddress','tipoOp','metodoPag'].forEach(id=>{
+        if(obj[id] !== undefined && document.getElementById(id)){
+          document.getElementById(id).value = obj[id];
+        }
+      });
+
+      ['tipoCliente','useSameAddress','tipoOp','metodoPag'].forEach(id=>{
+        const el = document.getElementById(id);
+        if(el){ el.dispatchEvent(new Event('change')); }
+      });
+
+      Object.keys(obj).forEach(id=>{
+        if(document.getElementById(id)){
+          document.getElementById(id).value = obj[id];
+        }
+      });
     }
-    function loadDraft(){ const raw = localStorage.getItem(DRAFT_KEY); if(!raw) return; try{ loadDraftObj(JSON.parse(raw)); saveStatus.textContent = 'Bozza caricata'; }catch(e){ console.warn('Errore bozza', e); } }
-    function clearDraft(){ localStorage.removeItem(DRAFT_KEY); saveStatus.textContent = 'Bozza cancellata'; }
+
+    function loadDraft(){
+      const raw = localStorage.getItem(DRAFT_KEY);
+      if(!raw) return;
+      try{
+        loadDraftObj(JSON.parse(raw));
+        saveStatus.textContent = 'Bozza caricata';
+      }catch(e){
+        console.warn('Errore bozza', e);
+      }
+    }
+
+    function clearDraft(){
+      localStorage.removeItem(DRAFT_KEY);
+      saveStatus.textContent = 'Bozza cancellata';
+    }
+
     document.getElementById('wizardForm').addEventListener('input', saveDraft);
     document.getElementById('wizardForm').addEventListener('change', saveDraft);
     document.getElementById('btnSaveDraft').addEventListener('click', saveDraft);
-    document.getElementById('btnClearDraft').addEventListener('click', ()=>{ clearDraft(); alert('Bozza cancellata. (I dati a video restano finché non ricarichi o modifichi manualmente)'); });
+    document.getElementById('btnClearDraft').addEventListener('click', ()=>{
+      clearDraft();
+      alert('Bozza cancellata. (I dati a video restano finché non ricarichi o modifichi manualmente)');
+    });
 
-    /* ====================== Storico pratiche ====================== */
     const PRACTICES_KEY = 'acea_portale_pratiche_v1';
     const historyCountEl = document.getElementById('historyCount');
-    function getPractices(){ try{ return JSON.parse(localStorage.getItem(PRACTICES_KEY) || '[]'); }catch{ return []; } }
-    function setPractices(arr){ localStorage.setItem(PRACTICES_KEY, JSON.stringify(arr)); updateHistoryCount(); }
-    function updateHistoryCount(){ historyCountEl.textContent = getPractices().length; }
-    function toLocalDateTime(iso){ const d = new Date(iso); const pad=n=>String(n).padStart(2,'0'); return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`; }
-    function resolvedFornituraAddressFromFields(f){ return (f['useSameAddress']==='same') ? (f['indirizzo']||'') : (f['indirizzoForn']||''); }
+
+    function getPractices(){
+      try{ return JSON.parse(localStorage.getItem(PRACTICES_KEY) || '[]'); }
+      catch{ return []; }
+    }
+
+    function setPractices(arr){
+      localStorage.setItem(PRACTICES_KEY, JSON.stringify(arr));
+      updateHistoryCount();
+    }
+
+    function updateHistoryCount(){
+      historyCountEl.textContent = getPractices().length;
+    }
+
+    function toLocalDateTime(iso){
+      const d = new Date(iso);
+      const pad=n=>String(n).padStart(2,'0');
+      return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
+    function resolvedFornituraAddressFromFields(f){
+      return (f['useSameAddress']==='same') ? (f['indirizzo']||'') : (f['indirizzoForn']||'');
+    }
 
     function savePractice(channel, message){
-      const fields = {}; document.querySelectorAll('#wizardForm input, #wizardForm select').forEach(el => fields[el.id] = el.value);
-      const tipo = fields['tipoCliente']; const nominativo = (tipo === 'privato') ? fields['nome'] : fields['azienda'];
+      const fields = {};
+      document.querySelectorAll('#wizardForm input, #wizardForm select').forEach(el => fields[el.id] = el.value);
+
+      const tipo = fields['tipoCliente'];
+      const nominativo = (tipo === 'privato')
+        ? [fields['nome'], fields['cognome']].filter(Boolean).join(' ')
+        : fields['azienda'];
+
       const practice = {
         id: Date.now().toString(36)+Math.random().toString(36).slice(2,7),
         created: new Date().toISOString(),
@@ -694,10 +790,13 @@
         fornitoreUscenteLuce: fields['fornitoreUscenteLuce'] || '',
         fornitoreUscenteGas: fields['fornitoreUscenteGas'] || ''
       };
-      const list = getPractices(); list.unshift(practice); setPractices(list); return practice.id;
+
+      const list = getPractices();
+      list.unshift(practice);
+      setPractices(list);
+      return practice.id;
     }
 
-    // UI Storico
     const modal = document.getElementById('historyModal');
     const tbody = document.getElementById('historyTbody');
     const searchInput = document.getElementById('historySearch');
@@ -705,12 +804,17 @@
 
     function renderHistory(){
       const q = (searchInput.value || '').toLowerCase();
-      const list = getPractices(); let shown = 0; tbody.innerHTML = '';
+      const list = getPractices();
+      let shown = 0;
+      tbody.innerHTML = '';
+
       list.forEach(p => {
         const hay = [p.cliente, p.operazione, p.indirizzoFornitura, p.codice, p.pod, p.pdr, p.metodoPag].join(' ').toLowerCase();
-        if(q && !hay.includes(q)) return; shown++;
+        if(q && !hay.includes(q)) return;
+        shown++;
+
         const tr = document.createElement('tr');
-        const stato = p.verified ? '<span class="badge badge-ok">Verificata</span>' : '<span class="badge">Da verificare</span>';
+        const stato = p.verified ? '<span class="badge badge-ok">Inserita</span>' : '<span class="badge">Da inserire</span>';
         tr.innerHTML = `
           <td>${toLocalDateTime(p.created)}</td>
           <td class="trunc" title="${(p.cliente||'-').replace(/"/g,'&quot;')}">
@@ -724,22 +828,38 @@
             <button type="button" class="link-btn" data-action="details" data-id="${p.id}">Dettagli</button>
             <button type="button" class="link-btn" data-action="copy" data-id="${p.id}">Copia testo</button>
             <button type="button" class="link-btn" data-action="draft" data-id="${p.id}">Riprendi bozza</button>
-            <button type="button" class="link-btn" data-action="togglev" data-id="${p.id}">${p.verified ? 'Segna non verif.' : 'Segna verificata'}</button>
+            <button type="button" class="link-btn" data-action="togglev" data-id="${p.id}">${p.verified ? 'Segna non inserita' : 'Segna inserita'}</button>
             <button type="button" class="link-btn" data-action="delete" data-id="${p.id}">Elimina</button>
           </td>`;
         tbody.appendChild(tr);
       });
+
       historyHint.textContent = shown ? `${shown} pratiche mostrate` : 'Nessuna pratica';
     }
-    function openHistory(){ renderHistory(); modal.classList.add('show'); modal.setAttribute('aria-hidden','false'); }
-    function closeHistory(){ modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); }
+
+    function openHistory(){
+      renderHistory();
+      modal.classList.add('show');
+      modal.setAttribute('aria-hidden','false');
+    }
+
+    function closeHistory(){
+      modal.classList.remove('show');
+      modal.setAttribute('aria-hidden','true');
+    }
+
     document.getElementById('btnOpenHistory').addEventListener('click', openHistory);
     document.getElementById('btnCloseHistory').addEventListener('click', closeHistory);
     document.getElementById('btnCloseBottom').addEventListener('click', closeHistory);
     modal.addEventListener('click', e => { if(e.target === modal) closeHistory(); });
-    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ if(document.getElementById('detailModal').classList.contains('show')) closeDetails(); else if(modal.classList.contains('show')) closeHistory(); } });
 
-    /* ===== Dettagli/Verifica ===== */
+    document.addEventListener('keydown', (e)=>{
+      if(e.key==='Escape'){
+        if(document.getElementById('detailModal').classList.contains('show')) closeDetails();
+        else if(modal.classList.contains('show')) closeHistory();
+      }
+    });
+
     const detailModal = document.getElementById('detailModal');
     const detailTitle = document.getElementById('detailTitle');
     const detailMeta = document.getElementById('detailMeta');
@@ -750,26 +870,57 @@
     let currentDetailId = null;
 
     const LABELS = {
-      tipoCliente:"Tipo Cliente", nome:"Nome e Cognome", azienda:"Ragione Sociale", codice:"Codice Fiscale/Partita IVA",
-      legaleRapp:"Legale Rappresentante", codiceLegale:"CF Legale Rappresentante", dataNascita:"Data di Nascita",
-      luogoNascita:"Luogo di Nascita", indirizzo:"Indirizzo", telefono:"Telefono", mail:"Mail",
-      tipoDoc:"Documento", numeroDoc:"Numero Documento", dataRilascio:"Data Rilascio", dataScadenza:"Data Scadenza",
-      rilasciatoDa:"Rilasciato da", useSameAddress:"Stesso indirizzo Anagrafica?", indirizzoForn:"Indirizzo Fornitura (specifico)",
-      tipoOp:"Tipo Operazione", pod:"POD", pdr:"PDR", fornitoreUscenteLuce:"Fornitore Uscente Luce",
-      fornitoreUscenteGas:"Fornitore Uscente Gas", matricola:"Matricola", titoloOcc:"Titolo Occupazionale",
-      dataPossesso:"Data Possesso", consumoAnnuale:"Consumo Annuale", offertaPrivatoLuce:"Offerta Luce (Privato)",
-      offertaPrivatoGas:"Offerta Gas (Privato)", offertaBusLuce:"Offerta Luce (Business)", offertaBusGas:"Offerta Gas (Business)",
-      metodoPag:"Metodo di Pagamento", iban:"IBAN"
+      tipoCliente:"Tipo Cliente",
+      nome:"Nome",
+      cognome:"Cognome",
+      azienda:"Ragione Sociale",
+      codice:"Codice Fiscale/Partita IVA",
+      legaleRapp:"Legale Rappresentante",
+      codiceLegale:"CF Legale Rappresentante",
+      dataNascita:"Data di Nascita",
+      luogoNascita:"Luogo di Nascita",
+      indirizzo:"Indirizzo",
+      telefono:"Telefono",
+      mail:"Mail",
+      tipoDoc:"Documento",
+      numeroDoc:"Numero Documento",
+      dataRilascio:"Data Rilascio",
+      dataScadenza:"Data Scadenza",
+      rilasciatoDa:"Rilasciato da",
+      useSameAddress:"Stesso indirizzo Anagrafica?",
+      indirizzoForn:"Indirizzo Fornitura (specifico)",
+      tipoOp:"Tipo Operazione",
+      pod:"POD",
+      pdr:"PDR",
+      fornitoreUscenteLuce:"Fornitore Uscente Luce",
+      fornitoreUscenteGas:"Fornitore Uscente Gas",
+      matricola:"Matricola",
+      titoloOcc:"Titolo Occupazionale",
+      dataPossesso:"Data Possesso",
+      consumoAnnuale:"Consumo Annuale",
+      offertaPrivatoLuce:"Offerta Luce (Privato)",
+      offertaPrivatoGas:"Offerta Gas (Privato)",
+      offertaBusLuce:"Offerta Luce (Business)",
+      offertaBusGas:"Offerta Gas (Business)",
+      metodoPag:"Metodo di Pagamento",
+      iban:"IBAN"
     };
+
     const ORDER = {
-      ANAGRAFICA: ["tipoCliente","nome","azienda","codice","legaleRapp","codiceLegale","dataNascita","luogoNascita","indirizzo","telefono","mail","tipoDoc","numeroDoc","dataRilascio","dataScadenza","rilasciatoDa"],
+      ANAGRAFICA: ["tipoCliente","nome","cognome","azienda","codice","legaleRapp","codiceLegale","dataNascita","luogoNascita","indirizzo","telefono","mail","tipoDoc","numeroDoc","dataRilascio","dataScadenza","rilasciatoDa"],
       FORNITURA: ["useSameAddress","indirizzoForn","tipoOp","pod","pdr","fornitoreUscenteLuce","fornitoreUscenteGas","matricola","titoloOcc","dataPossesso","consumoAnnuale","offertaPrivatoLuce","offertaPrivatoGas","offertaBusLuce","offertaBusGas"],
       CHIUSURA: ["metodoPag","iban"]
     };
 
     function buildSummaryFromFields(fields){
       summaryBlocks.innerHTML = '';
-      function addItem(k, v){ if(!v) return; const div = document.createElement('div'); div.className='kv-item'; div.innerHTML = `<div class="k">${LABELS[k]||k}</div><div class="v">${fmtValueForKey(k,v)}</div>`; summaryBlocks.appendChild(div); }
+      function addItem(k, v){
+        if(!v) return;
+        const div = document.createElement('div');
+        div.className='kv-item';
+        div.innerHTML = `<div class="k">${LABELS[k]||k}</div><div class="v">${fmtValueForKey(k,v)}</div>`;
+        summaryBlocks.appendChild(div);
+      }
       ORDER.ANAGRAFICA.forEach(k=> addItem(k, fields[k]));
       addItem('IndirizzoFornitura', resolvedFornituraAddressFromFields(fields));
       ORDER.FORNITURA.forEach(k=> addItem(k, fields[k]));
@@ -777,7 +928,9 @@
     }
 
     function collectCurrentFields(){
-      const obj={}; document.querySelectorAll('#wizardForm input, #wizardForm select').forEach(el=> obj[el.id]=el.value ); return obj;
+      const obj={};
+      document.querySelectorAll('#wizardForm input, #wizardForm select').forEach(el=> obj[el.id]=el.value );
+      return obj;
     }
 
     function buildDiff(practice){
@@ -785,8 +938,10 @@
       const sent = practice.fields || {};
       const curr = collectCurrentFields();
       const keys = new Set([...Object.keys(sent), ...Object.keys(curr)]);
+
       keys.forEach(k=>{
-        const a = sent[k] ?? ''; const b = curr[k] ?? '';
+        const a = sent[k] ?? '';
+        const b = curr[k] ?? '';
         const same = (a===b);
         const tr = document.createElement('tr');
         tr.className = same ? 'diff-same' : 'diff-diff';
@@ -798,27 +953,35 @@
 
     function openDetails(id){
       const list = getPractices();
-      const p = list.find(x=>x.id===id); if(!p) return;
+      const p = list.find(x=>x.id===id);
+      if(!p) return;
+
       currentDetailId = id;
       detailTitle.textContent = `🔎 Dettagli pratica – ${p.cliente || 'Cliente'} (${toLocalDateTime(p.created)})`;
-      const stato = p.verified ? 'Verificata' : 'Da verificare';
+      const stato = p.verified ? 'Inserita' : 'Da inserire';
       detailMeta.innerHTML = `<b>Canale:</b> ${p.channel} · <b>Stato:</b> ${stato} · <b>Operazione:</b> ${p.operazione || '-'} · <b>Indirizzo fornitura:</b> ${p.indirizzoFornitura || '-'}`;
       detailMessage.textContent = p.message || '';
       buildSummaryFromFields(p.fields||{});
       buildDiff(p);
-      btnToggleVerified.textContent = p.verified ? '🚫 Segna non verificata' : '✔️ Segna come verificata';
+      btnToggleVerified.textContent = p.verified ? '🚫 Segna non inserita' : '✔️ Segna come inserita';
       switchTab('summary');
-      detailModal.classList.add('show'); detailModal.setAttribute('aria-hidden','false');
+      detailModal.classList.add('show');
+      detailModal.setAttribute('aria-hidden','false');
     }
-    function closeDetails(){ detailModal.classList.remove('show'); detailModal.setAttribute('aria-hidden','true'); currentDetailId=null; }
 
-    // Tabs dettagli
+    function closeDetails(){
+      detailModal.classList.remove('show');
+      detailModal.setAttribute('aria-hidden','true');
+      currentDetailId=null;
+    }
+
     const tabSummary = document.getElementById('tabSummary');
     const tabDiff = document.getElementById('tabDiff');
     const tabMessage = document.getElementById('tabMessage');
     const panelSummary = document.getElementById('panelSummary');
     const panelDiff = document.getElementById('panelDiff');
     const panelMessage = document.getElementById('panelMessage');
+
     function switchTab(name){
       [tabSummary,tabDiff,tabMessage].forEach(b=>b.classList.remove('active'));
       [panelSummary,panelDiff,panelMessage].forEach(p=>p.classList.add('hidden'));
@@ -826,71 +989,104 @@
       if(name==='diff'){ tabDiff.classList.add('active'); panelDiff.classList.remove('hidden'); }
       if(name==='message'){ tabMessage.classList.add('active'); panelMessage.classList.remove('hidden'); }
     }
+
     tabSummary.addEventListener('click', ()=>switchTab('summary'));
     tabDiff.addEventListener('click', ()=>switchTab('diff'));
     tabMessage.addEventListener('click', ()=>switchTab('message'));
 
-    // Copy riepilogo / messaggio (con date formattate)
     function summaryAsText(){
       const fields = (getPractices().find(p=>p.id===currentDetailId)||{}).fields || {};
       const mk = (k)=> LABELS[k]||k;
       const lines = [];
       lines.push('— ANAGRAFICA —');
       ORDER.ANAGRAFICA.forEach(k=>{ if(fields[k]) lines.push(`${mk(k)}: ${fmtValueForKey(k, fields[k])}`); });
-      const indF = resolvedFornituraAddressFromFields(fields); if(indF) lines.push(`Indirizzo Fornitura: ${indF}`);
+      const indF = resolvedFornituraAddressFromFields(fields);
+      if(indF) lines.push(`Indirizzo Fornitura: ${indF}`);
       lines.push('\n— FORNITURA —');
       ORDER.FORNITURA.forEach(k=>{ if(fields[k]) lines.push(`${mk(k)}: ${fmtValueForKey(k, fields[k])}`); });
       lines.push('\n— PAGAMENTO —');
       ORDER.CHIUSURA.forEach(k=>{ if(fields[k]) lines.push(`${mk(k)}: ${fmtValueForKey(k, fields[k])}`); });
       return lines.join('\n');
     }
+
     async function copyText(text){
-      try{ await navigator.clipboard.writeText(text); alert('Copiato negli appunti.'); }
-      catch{
-        const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta);
-        ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+      try{
+        await navigator.clipboard.writeText(text);
+        alert('Copiato negli appunti.');
+      }catch{
+        const ta=document.createElement('textarea');
+        ta.value=text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
         alert('Copiato (fallback).');
       }
     }
-    document.getElementById('btnCopySummary').addEventListener('click', ()=>{ copyText(summaryAsText()); });
-    document.getElementById('btnCopyMessage').addEventListener('click', ()=>{
-      const p = getPractices().find(x=>x.id===currentDetailId); if(!p) return; copyText(p.message||'');
+
+    document.getElementById('btnCopySummary').addEventListener('click', ()=>{
+      copyText(summaryAsText());
     });
 
-    // Toggle verified
+    document.getElementById('btnCopyMessage').addEventListener('click', ()=>{
+      const p = getPractices().find(x=>x.id===currentDetailId);
+      if(!p) return;
+      copyText(p.message||'');
+    });
+
     document.getElementById('btnToggleVerified').addEventListener('click', ()=>{
       if(!currentDetailId) return;
-      const list = getPractices(); const idx = list.findIndex(p=>p.id===currentDetailId); if(idx<0) return;
-      list[idx].verified = !list[idx].verified; setPractices(list);
-      document.getElementById('btnToggleVerified').textContent = list[idx].verified ? '🚫 Segna non verificata' : '✔️ Segna come verificata';
+      const list = getPractices();
+      const idx = list.findIndex(p=>p.id===currentDetailId);
+      if(idx<0) return;
+      list[idx].verified = !list[idx].verified;
+      setPractices(list);
+      document.getElementById('btnToggleVerified').textContent = list[idx].verified ? '🚫 Segna non inserita' : '✔️ Segna come inserita';
       renderHistory();
-      const stato = list[idx].verified ? 'Verificata' : 'Da verificare';
+      const stato = list[idx].verified ? 'Inserita' : 'Da inserire';
       detailMeta.innerHTML = `<b>Canale:</b> ${list[idx].channel} · <b>Stato:</b> ${stato} · <b>Operazione:</b> ${list[idx].operazione || '-'} · <b>Indirizzo fornitura:</b> ${list[idx].indirizzoFornitura || '-'}`;
     });
 
-    // Delegazione azioni tabella storico
     tbody.addEventListener('click', async e => {
-      const btn = e.target.closest('button[data-action]'); if(!btn) return;
-      const id = btn.getAttribute('data-id'); const action = btn.getAttribute('data-action');
-      const list = getPractices(); const idx = list.findIndex(p => p.id === id); if(idx === -1) return;
+      const btn = e.target.closest('button[data-action]');
+      if(!btn) return;
+      const id = btn.getAttribute('data-id');
+      const action = btn.getAttribute('data-action');
+      const list = getPractices();
+      const idx = list.findIndex(p => p.id === id);
+      if(idx === -1) return;
 
       if(action === 'copy'){
         await copyText(list[idx].message || '');
       } else if(action === 'draft'){
-        const data = list[idx].fields || {}; localStorage.setItem(DRAFT_KEY, JSON.stringify(data)); loadDraftObj(data);
-        closeHistory(); show(0); saveStatus.textContent = 'Bozza caricata dallo storico'; window.scrollTo({ top: 0, behavior:'smooth' });
+        const data = list[idx].fields || {};
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
+        loadDraftObj(data);
+        closeHistory();
+        show(0);
+        saveStatus.textContent = 'Bozza caricata dallo storico';
+        window.scrollTo({ top: 0, behavior:'smooth' });
       } else if(action === 'delete'){
-        if(confirm('Eliminare questa pratica dallo storico?')){ list.splice(idx,1); setPractices(list); renderHistory(); }
+        if(confirm('Eliminare questa pratica dallo storico?')){
+          list.splice(idx,1);
+          setPractices(list);
+          renderHistory();
+        }
       } else if(action === 'togglev'){
-        list[idx].verified = !list[idx].verified; setPractices(list); renderHistory();
+        list[idx].verified = !list[idx].verified;
+        setPractices(list);
+        renderHistory();
       } else if(action === 'details'){
         openDetails(id);
       }
     });
 
-    // Esporta CSV / Svuota archivio
     document.getElementById('btnExportCSV').addEventListener('click', () => {
-      const list = getPractices(); if(!list.length){ alert('Archivio vuoto.'); return; }
+      const list = getPractices();
+      if(!list.length){
+        alert('Archivio vuoto.');
+        return;
+      }
       const headers = ['id','created','channel','verified','tipoCliente','cliente','codice','operazione','indirizzoFornitura','metodoPag','iban','pod','pdr','fornitoreUscenteLuce','fornitoreUscenteGas'];
       const rows = [headers.join(';')];
       list.forEach(p=>{
@@ -898,35 +1094,51 @@
         rows.push(row);
       });
       const blob = new Blob([rows.join('\n')], {type:'text/csv;charset=utf-8;'});
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-      a.download = `storico_pratiche_${new Date().toISOString().replace(/[:.]/g,'-')}.csv`; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `storico_pratiche_${new Date().toISOString().replace(/[:.]/g,'-')}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     });
-    document.getElementById('btnClearHistory').addEventListener('click', ()=>{ if(confirm('Svuotare completamente lo storico pratiche?')){ setPractices([]); renderHistory(); } });
 
-    /* ====================== Invio (salva + invia) ====================== */
+    document.getElementById('btnClearHistory').addEventListener('click', ()=>{
+      if(confirm('Svuotare completamente lo storico pratiche?')){
+        setPractices([]);
+        renderHistory();
+      }
+    });
+
     document.getElementById('btnSendWhatsApp').onclick = () => {
       if(!validateAll()) return;
-      const text = buildMessage(); savePractice('whatsapp', text);
+      const text = buildMessage();
+      savePractice('whatsapp', text);
       window.open(`https://wa.me/393701357100?text=${encodeURIComponent(text)}`,'_blank');
     };
+
     document.getElementById('btnSendMail').onclick = () => {
       if(!validateAll()) return;
       const text = buildMessage();
       const tipo = document.getElementById('tipoCliente').value;
-      const nominativo = (tipo === 'privato') ? document.getElementById('nome').value : document.getElementById('azienda').value;
+      const nominativo = (tipo === 'privato')
+        ? getFullPrivateName()
+        : document.getElementById('azienda').value;
       const subject = `Richiesta inserimento ${nominativo || 'contratto'}`;
       savePractice('mail', text);
       window.location.href = `mailto:mario.isernia@e2kdistribution.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`;
     };
 
-    /* ====================== Avvio ====================== */
     document.addEventListener('DOMContentLoaded', () => {
       updateHistoryCount();
       const raw = localStorage.getItem(DRAFT_KEY);
-      if(raw){ loadDraft(); }
-      else{
+      if(raw){
+        loadDraft();
+      } else {
         const sel = document.getElementById('useSameAddress');
-        if(sel){ sel.selectedIndex = 0; sel.dispatchEvent(new Event('change')); }
+        if(sel){
+          sel.selectedIndex = 0;
+          sel.dispatchEvent(new Event('change'));
+        }
       }
       document.addEventListener('click', (e)=>{
         if(e.target.id === 'btnCloseDetail' || e.target.closest('#btnCloseDetail')) closeDetails();
@@ -936,4 +1148,3 @@
   </script>
 </body>
 </html>
-
