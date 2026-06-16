@@ -321,7 +321,7 @@
           </div>
 
           <div class="form-group hidden" id="group-matricola">
-            <label for="matricola">Matricola</label>
+            <label for="matricola">Matricola Contatore</label>
             <input type="text" id="matricola" required>
           </div>
 
@@ -652,7 +652,7 @@
       const isSwitch = v.startsWith('SWITCH');
       const isLuceOnly = v.includes('LUCE') && !isDual;
       const isGasOnly  = v.includes('GAS')  && !isDual;
-      const isSubGas = v==='SUBENTRO_GAS_A01' || v==='SUBENTRO_GAS_A40';
+      const requiresMatricolaContatore = v==='SUBENTRO_GAS_A01' || v==='SUBENTRO_DUAL_LUCE_A01' || v==='SUBENTRO_GAS_A40';
       const isVolturaLike = v==='SWITCH_VOLTURA_LUCE' || v==='VOLTURA_LUCE_ACEA' || v==='VOLTURA_GAS_ACEA';
       const isSubOrVolt = v.startsWith('SUBENTRO') || isVolturaLike;
 
@@ -660,7 +660,7 @@
       setGroupVisibility('group-pdr', (isGasOnly  || isDual));
       setGroupVisibility('group-fornLuce', (isSwitch && (isLuceOnly || isDual)));
       setGroupVisibility('group-fornGas',  (isSwitch && (isGasOnly  || isDual)));
-      setGroupVisibility('group-matricola', isSubGas);
+      setGroupVisibility('group-matricola', requiresMatricolaContatore);
       setGroupVisibility('group-titoloOcc', isSubOrVolt);
       setGroupVisibility('group-dataPossesso', isSubOrVolt);
       setGroupVisibility('group-consumoAnnuale', v==='SWITCH_GAS');
@@ -894,7 +894,7 @@
       pdr:"PDR",
       fornitoreUscenteLuce:"Fornitore Uscente Luce",
       fornitoreUscenteGas:"Fornitore Uscente Gas",
-      matricola:"Matricola",
+      matricola:"Matricola Contatore",
       titoloOcc:"Titolo Occupazionale",
       dataPossesso:"Data Possesso",
       consumoAnnuale:"Consumo Annuale",
