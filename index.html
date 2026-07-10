@@ -762,6 +762,15 @@
             </select>
           </div>
 
+          <div class="form-group full">
+            <label for="residenzaCliente">Cliente residente</label>
+            <select id="residenzaCliente" required>
+              <option value="" disabled selected>-- Seleziona --</option>
+              <option value="residente">Residente</option>
+              <option value="non_residente">Non residente</option>
+            </select>
+          </div>
+
           <div class="form-group hidden" id="group-pod">
             <label for="pod">POD (luce)</label>
             <input type="text" id="pod" required>
@@ -803,8 +812,8 @@
           </div>
 
           <div class="form-group full hidden" id="group-consumoAnnuale">
-            <label for="consumoAnnuale">Consumo Annuale (SWITCH GAS)</label>
-            <input type="number" id="consumoAnnuale" required>
+            <label for="consumoAnnuale">Consumo annuo gas</label>
+            <input type="number" id="consumoAnnuale" required min="0" step="1">
           </div>
 
           <div class="form-group hidden" id="group-offertaPrivatoLuce">
@@ -1125,18 +1134,19 @@
       const isSwitch = v.startsWith('SWITCH');
       const isLuceOnly = v.includes('LUCE') && !isDual;
       const isGasOnly  = v.includes('GAS')  && !isDual;
+      const hasGasData = isGasOnly || isDual;
       const requiresMatricolaContatore = v==='SUBENTRO_GAS_A01' || v==='SUBENTRO_DUAL_LUCE_A01' || v==='SUBENTRO_GAS_A40';
       const isVolturaLike = v==='SWITCH_VOLTURA_LUCE' || v==='VOLTURA_LUCE_ACEA' || v==='VOLTURA_GAS_ACEA';
       const isSubOrVolt = v.startsWith('SUBENTRO') || isVolturaLike;
 
       setGroupVisibility('group-pod', (isLuceOnly || isDual));
-      setGroupVisibility('group-pdr', (isGasOnly  || isDual));
+      setGroupVisibility('group-pdr', hasGasData);
       setGroupVisibility('group-fornLuce', (isSwitch && (isLuceOnly || isDual)));
       setGroupVisibility('group-fornGas',  (isSwitch && (isGasOnly  || isDual)));
       setGroupVisibility('group-matricola', requiresMatricolaContatore);
       setGroupVisibility('group-titoloOcc', isSubOrVolt);
       setGroupVisibility('group-dataPossesso', isSubOrVolt);
-      setGroupVisibility('group-consumoAnnuale', v==='SWITCH_GAS');
+      setGroupVisibility('group-consumoAnnuale', hasGasData);
       setGroupVisibility('group-offertaPrivatoLuce',  priv && (isLuceOnly || isDual));
       setGroupVisibility('group-offertaPrivatoGas',   priv && (isGasOnly  || isDual));
       setGroupVisibility('group-offertaBusLuce',     !priv && (isLuceOnly || isDual));
@@ -1258,11 +1268,13 @@
         cliente: nominativo || '',
         codice: fields['codice'] || '',
         operazione: fields['tipoOp'] || '',
+        residenzaCliente: fields['residenzaCliente'] || '',
         indirizzoFornitura: resolvedFornituraAddress() || '',
         metodoPag: fields['metodoPag'] || '',
         iban: fields['iban'] || '',
         pod: fields['pod'] || '',
         pdr: fields['pdr'] || '',
+        consumoAnnuale: fields['consumoAnnuale'] || '',
         fornitoreUscenteLuce: fields['fornitoreUscenteLuce'] || '',
         fornitoreUscenteGas: fields['fornitoreUscenteGas'] || ''
       };
@@ -1285,7 +1297,7 @@
       tbody.innerHTML = '';
 
       list.forEach(p => {
-        const hay = [p.cliente, p.operazione, p.indirizzoFornitura, p.codice, p.pod, p.pdr, p.metodoPag].join(' ').toLowerCase();
+        const hay = [p.cliente, p.operazione, p.residenzaCliente, p.indirizzoFornitura, p.codice, p.pod, p.pdr, p.consumoAnnuale, p.metodoPag].join(' ').toLowerCase();
         if(q && !hay.includes(q)) return;
         shown++;
 
@@ -1368,6 +1380,7 @@
       useSameAddress:"Stesso indirizzo Anagrafica?",
       indirizzoForn:"Indirizzo Fornitura (specifico)",
       tipoOp:"Tipo Operazione",
+      residenzaCliente:"Cliente residente",
       pod:"POD",
       pdr:"PDR",
       fornitoreUscenteLuce:"Fornitore Uscente Luce",
@@ -1375,7 +1388,7 @@
       matricola:"Matricola Contatore",
       titoloOcc:"Titolo Occupazionale",
       dataPossesso:"Data Possesso",
-      consumoAnnuale:"Consumo Annuale",
+      consumoAnnuale:"Consumo annuo gas",
       offertaPrivatoLuce:"Offerta Luce (Privato)",
       offertaPrivatoGas:"Offerta Gas (Privato)",
       offertaBusLuce:"Offerta Luce (Business)",
@@ -1386,7 +1399,7 @@
 
     const ORDER = {
       ANAGRAFICA: ["tipoCliente","nome","cognome","azienda","codice","legaleRapp","codiceLegale","dataNascita","luogoNascita","indirizzo","citta","cap","telefono","mail","tipoDoc","numeroDoc","dataRilascio","dataScadenza","rilasciatoDa"],
-      FORNITURA: ["useSameAddress","indirizzoForn","tipoOp","pod","pdr","fornitoreUscenteLuce","fornitoreUscenteGas","matricola","titoloOcc","dataPossesso","consumoAnnuale","offertaPrivatoLuce","offertaPrivatoGas","offertaBusLuce","offertaBusGas"],
+      FORNITURA: ["useSameAddress","indirizzoForn","tipoOp","residenzaCliente","pod","pdr","fornitoreUscenteLuce","fornitoreUscenteGas","matricola","titoloOcc","dataPossesso","consumoAnnuale","offertaPrivatoLuce","offertaPrivatoGas","offertaBusLuce","offertaBusGas"],
       CHIUSURA: ["metodoPag","iban"]
     };
 
@@ -1565,7 +1578,7 @@
         alert('Archivio vuoto.');
         return;
       }
-      const headers = ['id','created','channel','verified','tipoCliente','cliente','codice','operazione','indirizzoFornitura','metodoPag','iban','pod','pdr','fornitoreUscenteLuce','fornitoreUscenteGas'];
+      const headers = ['id','created','channel','verified','tipoCliente','cliente','codice','operazione','residenzaCliente','indirizzoFornitura','metodoPag','iban','pod','pdr','consumoAnnuale','fornitoreUscenteLuce','fornitoreUscenteGas'];
       const rows = [headers.join(';')];
       list.forEach(p=>{
         const row = headers.map(h=> `"${(p[h] ?? '').toString().replace(/[\r\n]+/g,' ').replace(/;/g, ',')}"`).join(';');
