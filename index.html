@@ -1135,6 +1135,7 @@
       const isLuceOnly = v.includes('LUCE') && !isDual;
       const isGasOnly  = v.includes('GAS')  && !isDual;
       const hasGasData = isGasOnly || isDual;
+      const requiresConsumoAnnualeGas = hasGasData && !v.startsWith('SUBENTRO_GAS');
       const requiresMatricolaContatore = v==='SUBENTRO_GAS_A01' || v==='SUBENTRO_DUAL_LUCE_A01' || v==='SUBENTRO_GAS_A40';
       const isVolturaLike = v==='SWITCH_VOLTURA_LUCE' || v==='VOLTURA_LUCE_ACEA' || v==='VOLTURA_GAS_ACEA';
       const isSubOrVolt = v.startsWith('SUBENTRO') || isVolturaLike;
@@ -1146,7 +1147,7 @@
       setGroupVisibility('group-matricola', requiresMatricolaContatore);
       setGroupVisibility('group-titoloOcc', isSubOrVolt);
       setGroupVisibility('group-dataPossesso', isSubOrVolt);
-      setGroupVisibility('group-consumoAnnuale', hasGasData);
+      setGroupVisibility('group-consumoAnnuale', requiresConsumoAnnualeGas);
       setGroupVisibility('group-offertaPrivatoLuce',  priv && (isLuceOnly || isDual));
       setGroupVisibility('group-offertaPrivatoGas',   priv && (isGasOnly  || isDual));
       setGroupVisibility('group-offertaBusLuce',     !priv && (isLuceOnly || isDual));
