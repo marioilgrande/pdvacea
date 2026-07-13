@@ -356,6 +356,11 @@
       color:var(--ink);
       font-size:.98rem;
     }
+    #wizardForm input,
+    #wizardForm select,
+    #wizardForm textarea{
+      text-transform:uppercase;
+    }
     .form-group input::placeholder{
       color:#9aa6b2;
     }
@@ -978,6 +983,27 @@
       if(DATE_KEYS.has(key)) return formatDateDMY(value);
       return value;
     }
+    function toFormUppercase(value){
+      return (value || '').toLocaleUpperCase('it-IT');
+    }
+    function shouldUppercaseField(el){
+      if(!el || !el.matches('input, textarea')) return false;
+      return ['text','tel','email','search'].includes((el.type || '').toLowerCase());
+    }
+    function normalizeFieldValue(el){
+      if(!shouldUppercaseField(el)) return;
+      const upper = toFormUppercase(el.value);
+      if(el.value === upper) return;
+      const start = el.selectionStart;
+      const end = el.selectionEnd;
+      el.value = upper;
+      if(typeof start === 'number' && typeof end === 'number'){
+        el.setSelectionRange(start, end);
+      }
+    }
+    function normalizeFormValues(){
+      document.querySelectorAll('#wizardForm input, #wizardForm textarea').forEach(normalizeFieldValue);
+    }
 
     function setGroupVisibility(groupId, visible){
       const el = document.getElementById(groupId);
@@ -1086,6 +1112,7 @@
     }
 
     function buildMessage(){
+      normalizeFormValues();
       const body = collectVisibleLabeledData();
       return `Ciao!\nTi chiedo di inserire questa pratica e darmi conferma inserimento:\n\n${body}\n\nGrazie per il supporto`;
     }
@@ -1165,6 +1192,7 @@
     const saveStatus = document.getElementById('saveStatus');
 
     function saveDraft(){
+      normalizeFormValues();
       const data = {};
       document.querySelectorAll('#wizardForm input, #wizardForm select, #wizardForm textarea').forEach(el=>{
         data[el.id] = el.value;
@@ -1191,6 +1219,7 @@
       Object.keys(obj).forEach(id=>{
         if(document.getElementById(id)){
           document.getElementById(id).value = obj[id];
+          normalizeFieldValue(document.getElementById(id));
         }
       });
     }
@@ -1211,8 +1240,14 @@
       saveStatus.textContent = 'Bozza cancellata';
     }
 
-    document.getElementById('wizardForm').addEventListener('input', saveDraft);
-    document.getElementById('wizardForm').addEventListener('change', saveDraft);
+    document.getElementById('wizardForm').addEventListener('input', e=>{
+      normalizeFieldValue(e.target);
+      saveDraft();
+    });
+    document.getElementById('wizardForm').addEventListener('change', e=>{
+      normalizeFieldValue(e.target);
+      saveDraft();
+    });
     document.getElementById('btnSaveDraft').addEventListener('click', saveDraft);
     document.getElementById('btnClearDraft').addEventListener('click', ()=>{
       clearDraft();
@@ -1250,6 +1285,7 @@
     }
 
     function savePractice(channel, message){
+      normalizeFormValues();
       const fields = {};
       document.querySelectorAll('#wizardForm input, #wizardForm select').forEach(el => fields[el.id] = el.value);
 
@@ -1603,7 +1639,7 @@
 
     document.getElementById('btnSendWhatsApp').onclick = () => {
       if(!validateAll()) return;
-      const text = buildMessage();
+      const text = toFormUppercase(buildMessage());
       savePractice('whatsapp', text);
       window.open(`https://wa.me/393701357100?text=${encodeURIComponent(text)}`,'_blank');
     };
