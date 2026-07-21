@@ -762,6 +762,8 @@
               <option value="SUBENTRO_DUAL_LUCE_A01">SUBENTRO DUAL LUCE &gt; A01</option>
               <option value="SUBENTRO_GAS_A40">SUBENTRO GAS A40</option>
               <option value="SWITCH_VOLTURA_LUCE">SWITCH CON VOLTURA LUCE</option>
+              <option value="SWITCH_VOLTURA_GAS">SWITCH CON VOLTURA GAS</option>
+              <option value="SWITCH_VOLTURA_DUAL">SWITCH CON VOLTURA DUAL</option>
               <option value="VOLTURA_LUCE_ACEA">VOLTURA LUCE (CLIENTE ACEA)</option>
               <option value="VOLTURA_GAS_ACEA">VOLTURA GAS (CLIENTE ACEA)</option>
             </select>
@@ -1162,9 +1164,10 @@
       const isLuceOnly = v.includes('LUCE') && !isDual;
       const isGasOnly  = v.includes('GAS')  && !isDual;
       const hasGasData = isGasOnly || isDual;
-      const requiresConsumoAnnualeGas = hasGasData && !v.startsWith('SUBENTRO_GAS');
-      const requiresMatricolaContatore = v==='SUBENTRO_GAS_A01' || v==='SUBENTRO_DUAL_LUCE_A01' || v==='SUBENTRO_GAS_A40';
-      const isVolturaLike = v==='SWITCH_VOLTURA_LUCE' || v==='VOLTURA_LUCE_ACEA' || v==='VOLTURA_GAS_ACEA';
+      const isSwitchVolturaGas = v==='SWITCH_VOLTURA_GAS' || v==='SWITCH_VOLTURA_DUAL';
+      const requiresConsumoAnnualeGas = hasGasData && !v.startsWith('SUBENTRO_GAS') && !isSwitchVolturaGas;
+      const requiresMatricolaContatore = v==='SUBENTRO_GAS_A01' || v==='SUBENTRO_DUAL_LUCE_A01' || v==='SUBENTRO_GAS_A40' || isSwitchVolturaGas;
+      const isVolturaLike = v==='SWITCH_VOLTURA_LUCE' || isSwitchVolturaGas || v==='VOLTURA_LUCE_ACEA' || v==='VOLTURA_GAS_ACEA';
       const isSubOrVolt = v.startsWith('SUBENTRO') || isVolturaLike;
 
       setGroupVisibility('group-pod', (isLuceOnly || isDual));
