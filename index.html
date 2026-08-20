@@ -369,6 +369,64 @@
       border-color:var(--brand);
       box-shadow:none;
     }
+    .extra-supply-toolbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .extra-supply-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .extra-supplies{
+      display:grid;
+      gap:12px;
+      margin-top:12px;
+    }
+    .extra-supply-card{
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:#fff;
+      padding:12px;
+    }
+    .extra-supply-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:10px;
+      color:var(--brand-strong);
+      font-weight:850;
+      text-transform:uppercase;
+      font-size:.86rem;
+    }
+    .extra-supply-grid{
+      display:grid;
+      gap:10px;
+    }
+    .extra-supplies-panel{
+      grid-column:1 / -1;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:var(--surface-muted);
+      padding:12px;
+    }
+    .extra-supplies-panel label{
+      color:#344150;
+      font-size:.82rem;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+      margin-bottom:4px;
+      display:block;
+      font-weight:800;
+    }
+    @media (min-width: 780px){
+      .extra-supply-grid{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
+      .extra-supply-grid .full{ grid-column:1 / -1; }
+    }
     .buttons{
       margin-top:22px;
       padding-top:18px;
@@ -550,6 +608,7 @@
     .kv-item .v{
       color:var(--ink);
       font-weight:700;
+      white-space:pre-line;
     }
     pre.code{
       background:#172331;
@@ -858,6 +917,20 @@
               <option>SPRINT GAS</option>
             </select>
           </div>
+
+          <div class="extra-supplies-panel hidden" id="group-extraSupplies">
+            <div class="extra-supply-toolbar">
+              <div>
+                <label>POD/PDR aggiuntivi</label>
+                <span class="hint">Aggiungi altri punti intestati allo stesso cliente, con indirizzo completo per ciascuno.</span>
+              </div>
+              <div class="extra-supply-actions">
+                <button type="button" class="link-btn" id="btnAddPod">Aggiungi altro POD</button>
+                <button type="button" class="link-btn" id="btnAddPdr">Aggiungi altro PDR</button>
+              </div>
+            </div>
+            <div class="extra-supplies" id="extraSuppliesList"></div>
+          </div>
         </div>
 
         <div class="buttons">
@@ -983,6 +1056,7 @@
     function fmtValueForKey(key, value){
       if(!value) return '';
       if(DATE_KEYS.has(key)) return formatDateDMY(value);
+      if(key === 'extraSupplies') return formatExtraSuppliesForText(value);
       return value;
     }
     function toFormUppercase(value){
@@ -1005,6 +1079,161 @@
     }
     function normalizeFormValues(){
       document.querySelectorAll('#wizardForm input, #wizardForm textarea').forEach(normalizeFieldValue);
+    }
+    function escapeHtml(value){
+      return (value || '').toString().replace(/[&<>"']/g, ch => ({
+        '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+      }[ch]));
+    }
+
+    const EXTRA_REQUEST_TYPES = {
+      switch: {
+        pod: [
+          { value:'SWITCH_LUCE', label:'SWITCH LUCE' },
+          { value:'SWITCH_VOLTURA_LUCE', label:'SWITCH CON VOLTURA LUCE' }
+        ],
+        pdr: [
+          { value:'SWITCH_GAS', label:'SWITCH GAS' },
+          { value:'SWITCH_VOLTURA_GAS', label:'SWITCH CON VOLTURA GAS' }
+        ]
+      },
+      subentro: {
+        pod: [
+          { value:'SUBENTRO_LUCE', label:'SUBENTRO LUCE' },
+          { value:'VOLTURA_LUCE_ACEA', label:'VOLTURA LUCE' }
+        ],
+        pdr: [
+          { value:'SUBENTRO_GAS_A01', label:'ATTIVAZIONE GAS A01' },
+          { value:'SUBENTRO_GAS_A40', label:'ATTIVAZIONE GAS A40' },
+          { value:'VOLTURA_GAS_ACEA', label:'VOLTURA GAS' }
+        ]
+      }
+    };
+    let extraSupplySeq = 0;
+
+    function getOperationFamily(value){
+      if(!value) return '';
+      if(value.startsWith('SWITCH')) return 'switch';
+      if(value.startsWith('SUBENTRO') || value.startsWith('VOLTURA')) return 'subentro';
+      return '';
+    }
+    function getAllowedExtraKinds(value){
+      if(!value) return [];
+      if(value.includes('DUAL')) return ['pod','pdr'];
+      if(value.includes('LUCE')) return ['pod'];
+      if(value.includes('GAS')) return ['pdr'];
+      return [];
+    }
+    function getExtraTypeLabel(value){
+      const all = [
+        ...EXTRA_REQUEST_TYPES.switch.pod,
+        ...EXTRA_REQUEST_TYPES.switch.pdr,
+        ...EXTRA_REQUEST_TYPES.subentro.pod,
+        ...EXTRA_REQUEST_TYPES.subentro.pdr
+      ];
+      return all.find(item => item.value === value)?.label || value;
+    }
+    function getExtraTypeOptions(kind){
+      const family = getOperationFamily(document.getElementById('tipoOp')?.value || '');
+      return (EXTRA_REQUEST_TYPES[family]?.[kind] || []);
+    }
+    function resetExtraSupplies(){
+      const list = document.getElementById('extraSuppliesList');
+      if(list) list.innerHTML = '';
+    }
+    function updateExtraSupplyControls(value){
+      const group = document.getElementById('group-extraSupplies');
+      const btnPod = document.getElementById('btnAddPod');
+      const btnPdr = document.getElementById('btnAddPdr');
+      if(!group || !btnPod || !btnPdr) return;
+
+      const family = getOperationFamily(value);
+      const allowedKinds = getAllowedExtraKinds(value);
+      const enabled = !!family && allowedKinds.length > 0;
+      group.classList.toggle('hidden', !enabled);
+      btnPod.classList.toggle('hidden', !allowedKinds.includes('pod'));
+      btnPdr.classList.toggle('hidden', !allowedKinds.includes('pdr'));
+      btnPod.disabled = !allowedKinds.includes('pod');
+      btnPdr.disabled = !allowedKinds.includes('pdr');
+      if(!enabled) resetExtraSupplies();
+    }
+    function addExtraSupply(kind, data = {}){
+      const list = document.getElementById('extraSuppliesList');
+      const options = getExtraTypeOptions(kind);
+      if(!list || !options.length) return;
+
+      const id = `extraSupply${++extraSupplySeq}`;
+      const pointLabel = kind === 'pod' ? 'POD' : 'PDR';
+      const optionsHtml = [
+        '<option value="" disabled selected>-- Seleziona --</option>',
+        ...options.map(item => `<option value="${escapeHtml(item.value)}">${escapeHtml(item.label)}</option>`)
+      ].join('');
+
+      const card = document.createElement('div');
+      card.className = 'extra-supply-card';
+      card.dataset.kind = kind;
+      card.innerHTML = `
+        <div class="extra-supply-head">
+          <span>${pointLabel} aggiuntivo</span>
+          <button type="button" class="link-btn" data-action="remove-extra-supply">Rimuovi</button>
+        </div>
+        <div class="extra-supply-grid">
+          <div class="form-group full">
+            <label for="${id}Tipo">Tipologia richiesta</label>
+            <select id="${id}Tipo" data-extra-field="requestType" required>${optionsHtml}</select>
+          </div>
+          <div class="form-group">
+            <label for="${id}Point">${pointLabel}</label>
+            <input type="text" id="${id}Point" data-extra-field="point" required>
+          </div>
+          <div class="form-group">
+            <label for="${id}Indirizzo">Indirizzo</label>
+            <input type="text" id="${id}Indirizzo" data-extra-field="indirizzo" required>
+          </div>
+          <div class="form-group">
+            <label for="${id}Citta">Città</label>
+            <input type="text" id="${id}Citta" data-extra-field="citta" required>
+          </div>
+          <div class="form-group">
+            <label for="${id}Cap">CAP</label>
+            <input type="text" id="${id}Cap" data-extra-field="cap" inputmode="numeric" maxlength="5" required>
+          </div>
+        </div>`;
+      list.appendChild(card);
+
+      card.querySelector('[data-extra-field="requestType"]').value = data.requestType || '';
+      card.querySelector('[data-extra-field="point"]').value = data.point || '';
+      card.querySelector('[data-extra-field="indirizzo"]').value = data.indirizzo || '';
+      card.querySelector('[data-extra-field="citta"]').value = data.citta || '';
+      card.querySelector('[data-extra-field="cap"]').value = data.cap || '';
+      card.querySelectorAll('input').forEach(normalizeFieldValue);
+    }
+    function serializeExtraSupplies(){
+      return [...document.querySelectorAll('#extraSuppliesList .extra-supply-card')].map(card => ({
+        kind: card.dataset.kind || '',
+        requestType: card.querySelector('[data-extra-field="requestType"]')?.value || '',
+        point: card.querySelector('[data-extra-field="point"]')?.value || '',
+        indirizzo: card.querySelector('[data-extra-field="indirizzo"]')?.value || '',
+        citta: card.querySelector('[data-extra-field="citta"]')?.value || '',
+        cap: card.querySelector('[data-extra-field="cap"]')?.value || ''
+      }));
+    }
+    function formatExtraSuppliesForText(extras){
+      if(!Array.isArray(extras) || !extras.length) return '';
+      const rows = extras.map((item, idx) => {
+        const pointLabel = item.kind === 'pod' ? 'POD' : 'PDR';
+        const address = [item.indirizzo, item.citta, item.cap].filter(Boolean).join(', ');
+        return [
+          `PUNTO AGGIUNTIVO ${idx + 1} (${pointLabel})`,
+          item.requestType ? `Tipologia richiesta: ${getExtraTypeLabel(item.requestType)}` : '',
+          item.point ? `${pointLabel}: ${item.point}` : '',
+          address ? `Indirizzo completo: ${address}` : ''
+        ].filter(Boolean).join('\n');
+      }).join('\n\n');
+      return `FORNITURE AGGIUNTIVE\n\n${rows}`;
+    }
+    function extraSuppliesSearchText(extras){
+      return formatExtraSuppliesForText(extras).replace(/\s+/g, ' ');
     }
 
     function setGroupVisibility(groupId, visible){
@@ -1043,9 +1272,9 @@
 
     function validateSection(sectionId){
       const container = document.getElementById(sectionId);
-      const fields = container.querySelectorAll('.form-group:not(.hidden) input, .form-group:not(.hidden) select, .form-group:not(.hidden) textarea');
+      const fields = container.querySelectorAll('input, select, textarea');
       for(const f of fields){
-        if(f.disabled) continue;
+        if(f.disabled || f.closest('.hidden')) continue;
         const isEmpty = (f.tagName === 'SELECT') ? (f.value === '' || f.selectedIndex === 0) : (f.value.trim() === '');
         if(isEmpty){
           const label = (f.closest('.form-group')?.querySelector('label')?.innerText || f.id);
@@ -1072,7 +1301,7 @@
       const blocks = [];
 
       order.forEach(sec => {
-        const groups = document.querySelectorAll(`#${sec.id} .form-group:not(.hidden)`);
+        const groups = document.querySelectorAll(`#${sec.id} > .grid > .form-group:not(.hidden)`);
         const lines = [];
         let fornituraAddressInserted = false;
 
@@ -1084,7 +1313,8 @@
           if (ctrl.id === 'useSameAddress') {
             const addr = resolvedFornituraAddress();
             if (addr) {
-              lines.push(`Indirizzo Fornitura: ${addr}`);
+              const sameAddress = ctrl.value === 'same';
+              lines.push(`Indirizzo Fornitura: ${sameAddress ? 'Come anagrafica' : addr}`);
               fornituraAddressInserted = true;
             }
             return;
@@ -1101,6 +1331,11 @@
           const lab = labelEl ? labelEl.innerText : (ctrl.id || 'Campo');
           if (value !== '') lines.push(`${lab}: ${value}`);
         });
+
+        if (sec.id === 'section-fornitura') {
+          const extraText = formatExtraSuppliesForText(serializeExtraSupplies());
+          if (extraText) lines.push(extraText);
+        }
 
         if (sec.id === 'section-fornitura' && !fornituraAddressInserted) {
           const addr = resolvedFornituraAddress();
@@ -1166,7 +1401,7 @@
       const hasGasData = isGasOnly || isDual;
       const isSwitchVolturaGas = v==='SWITCH_VOLTURA_GAS' || v==='SWITCH_VOLTURA_DUAL';
       const requiresConsumoAnnualeGas = hasGasData && !v.startsWith('SUBENTRO_GAS') && !isSwitchVolturaGas;
-      const requiresMatricolaContatore = v==='SUBENTRO_GAS_A01' || v==='SUBENTRO_DUAL_LUCE_A01' || v==='SUBENTRO_GAS_A40' || isSwitchVolturaGas;
+      const requiresMatricolaContatore = v==='SUBENTRO_GAS_A01' || v==='SUBENTRO_DUAL_LUCE_A01' || v==='SUBENTRO_GAS_A40';
       const isVolturaLike = v==='SWITCH_VOLTURA_LUCE' || isSwitchVolturaGas || v==='VOLTURA_LUCE_ACEA' || v==='VOLTURA_GAS_ACEA';
       const isSubOrVolt = v.startsWith('SUBENTRO') || isVolturaLike;
 
@@ -1182,6 +1417,8 @@
       setGroupVisibility('group-offertaPrivatoGas',   priv && (isGasOnly  || isDual));
       setGroupVisibility('group-offertaBusLuce',     !priv && (isLuceOnly || isDual));
       setGroupVisibility('group-offertaBusGas',      !priv && (isGasOnly  || isDual));
+      resetExtraSupplies();
+      updateExtraSupplyControls(v);
     });
 
     document.getElementById('metodoPag').addEventListener('change', e => {
@@ -1197,9 +1434,10 @@
     function saveDraft(){
       normalizeFormValues();
       const data = {};
-      document.querySelectorAll('#wizardForm input, #wizardForm select, #wizardForm textarea').forEach(el=>{
+      document.querySelectorAll('#wizardForm input:not([data-extra-field]), #wizardForm select:not([data-extra-field]), #wizardForm textarea:not([data-extra-field])').forEach(el=>{
         data[el.id] = el.value;
       });
+      data.extraSupplies = serializeExtraSupplies();
       localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
       const now = new Date();
       const hh = String(now.getHours()).padStart(2,'0');
@@ -1225,6 +1463,10 @@
           normalizeFieldValue(document.getElementById(id));
         }
       });
+      resetExtraSupplies();
+      if(Array.isArray(obj.extraSupplies)){
+        obj.extraSupplies.forEach(item => addExtraSupply(item.kind, item));
+      }
     }
 
     function loadDraft(){
@@ -1255,6 +1497,20 @@
     document.getElementById('btnClearDraft').addEventListener('click', ()=>{
       clearDraft();
       alert('Bozza cancellata. (I dati a video restano finché non ricarichi o modifichi manualmente)');
+    });
+    document.getElementById('btnAddPod').addEventListener('click', ()=>{
+      addExtraSupply('pod');
+      saveDraft();
+    });
+    document.getElementById('btnAddPdr').addEventListener('click', ()=>{
+      addExtraSupply('pdr');
+      saveDraft();
+    });
+    document.getElementById('extraSuppliesList').addEventListener('click', e=>{
+      const btn = e.target.closest('button[data-action="remove-extra-supply"]');
+      if(!btn) return;
+      btn.closest('.extra-supply-card')?.remove();
+      saveDraft();
     });
 
     const PRACTICES_KEY = 'acea_portale_pratiche_v1';
@@ -1290,7 +1546,9 @@
     function savePractice(channel, message){
       normalizeFormValues();
       const fields = {};
-      document.querySelectorAll('#wizardForm input, #wizardForm select').forEach(el => fields[el.id] = el.value);
+      document.querySelectorAll('#wizardForm input:not([data-extra-field]), #wizardForm select:not([data-extra-field])').forEach(el => fields[el.id] = el.value);
+      fields.extraSupplies = serializeExtraSupplies();
+      const extraForniture = formatExtraSuppliesForText(fields.extraSupplies);
 
       const tipo = fields['tipoCliente'];
       const nominativo = (tipo === 'privato')
@@ -1315,6 +1573,7 @@
         pod: fields['pod'] || '',
         pdr: fields['pdr'] || '',
         consumoAnnuale: fields['consumoAnnuale'] || '',
+        extraForniture,
         fornitoreUscenteLuce: fields['fornitoreUscenteLuce'] || '',
         fornitoreUscenteGas: fields['fornitoreUscenteGas'] || ''
       };
@@ -1337,7 +1596,7 @@
       tbody.innerHTML = '';
 
       list.forEach(p => {
-        const hay = [p.cliente, p.operazione, p.residenzaCliente, p.indirizzoFornitura, p.codice, p.pod, p.pdr, p.consumoAnnuale, p.metodoPag].join(' ').toLowerCase();
+        const hay = [p.cliente, p.operazione, p.residenzaCliente, p.indirizzoFornitura, p.codice, p.pod, p.pdr, p.consumoAnnuale, p.extraForniture, p.metodoPag].join(' ').toLowerCase();
         if(q && !hay.includes(q)) return;
         shown++;
 
@@ -1429,6 +1688,7 @@
       titoloOcc:"Titolo Occupazionale",
       dataPossesso:"Data Possesso",
       consumoAnnuale:"Consumo annuo gas",
+      extraSupplies:"POD/PDR aggiuntivi",
       offertaPrivatoLuce:"Offerta Luce (Privato)",
       offertaPrivatoGas:"Offerta Gas (Privato)",
       offertaBusLuce:"Offerta Luce (Business)",
@@ -1439,7 +1699,7 @@
 
     const ORDER = {
       ANAGRAFICA: ["tipoCliente","nome","cognome","azienda","codice","legaleRapp","codiceLegale","dataNascita","luogoNascita","indirizzo","citta","cap","telefono","mail","tipoDoc","numeroDoc","dataRilascio","dataScadenza","rilasciatoDa"],
-      FORNITURA: ["useSameAddress","indirizzoForn","tipoOp","residenzaCliente","pod","pdr","fornitoreUscenteLuce","fornitoreUscenteGas","matricola","titoloOcc","dataPossesso","consumoAnnuale","offertaPrivatoLuce","offertaPrivatoGas","offertaBusLuce","offertaBusGas"],
+      FORNITURA: ["useSameAddress","indirizzoForn","tipoOp","residenzaCliente","pod","pdr","fornitoreUscenteLuce","fornitoreUscenteGas","matricola","titoloOcc","dataPossesso","consumoAnnuale","extraSupplies","offertaPrivatoLuce","offertaPrivatoGas","offertaBusLuce","offertaBusGas"],
       CHIUSURA: ["metodoPag","iban"]
     };
 
@@ -1460,7 +1720,8 @@
 
     function collectCurrentFields(){
       const obj={};
-      document.querySelectorAll('#wizardForm input, #wizardForm select').forEach(el=> obj[el.id]=el.value );
+      document.querySelectorAll('#wizardForm input:not([data-extra-field]), #wizardForm select:not([data-extra-field])').forEach(el=> obj[el.id]=el.value );
+      obj.extraSupplies = serializeExtraSupplies();
       return obj;
     }
 
@@ -1473,7 +1734,7 @@
       keys.forEach(k=>{
         const a = sent[k] ?? '';
         const b = curr[k] ?? '';
-        const same = (a===b);
+        const same = JSON.stringify(a) === JSON.stringify(b);
         const tr = document.createElement('tr');
         tr.className = same ? 'diff-same' : 'diff-diff';
         const label = LABELS[k] || k;
@@ -1618,7 +1879,7 @@
         alert('Archivio vuoto.');
         return;
       }
-      const headers = ['id','created','channel','verified','tipoCliente','cliente','codice','operazione','residenzaCliente','indirizzoFornitura','metodoPag','iban','pod','pdr','consumoAnnuale','fornitoreUscenteLuce','fornitoreUscenteGas'];
+      const headers = ['id','created','channel','verified','tipoCliente','cliente','codice','operazione','residenzaCliente','indirizzoFornitura','metodoPag','iban','pod','pdr','consumoAnnuale','extraForniture','fornitoreUscenteLuce','fornitoreUscenteGas'];
       const rows = [headers.join(';')];
       list.forEach(p=>{
         const row = headers.map(h=> `"${(p[h] ?? '').toString().replace(/[\r\n]+/g,' ').replace(/;/g, ',')}"`).join(';');
