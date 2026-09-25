@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Portale Inserimento Contratti ACEA</title>
+  <title>Portale Inserimento Contratti</title>
   <style>
     :root{
       --acea-green:#0ABAB5;
@@ -652,13 +652,74 @@
         flex:1;
       }
     }
+    body{
+      background:#eef2f4;
+      font-family:Inter, Aptos, "Segoe UI Variable", "Segoe UI", Arial, sans-serif;
+    }
+    body[data-brand="ACEA"]{ --brand:#007f87; --brand-strong:#005a64; --brand-soft:#e8f7f7; --brand-border:#a9d8da; }
+    body[data-brand="PLENITUDE"]{ --brand:#008552; --brand-strong:#00633f; --brand-soft:#eaf7ee; --brand-border:#a5d8bb; }
+    body[data-brand="ALPERIA"]{ --brand:#00547a; --brand-strong:#003d59; --brand-soft:#eaf4f8; --brand-border:#a8cbdc; }
+    body[data-brand="SORGENIA"]{ --brand:#397600; --brand-strong:#2b5900; --brand-soft:#eff8e4; --brand-border:#bad998; }
+    .container{ max-width:1140px; border-radius:8px; border:1px solid #dce4e8; box-shadow:0 14px 44px rgba(26,44,56,.1); }
+    .header{ height:5px; background:var(--brand); }
+    .title{ background:#fff; min-height:76px; }
+    .title h1{ font-size:1.24rem; }
+    .title h1 span{ letter-spacing:0; text-transform:none; font-weight:500; }
+    .title-right{ flex-wrap:wrap; }
+    #saveStatus{ border-color:var(--brand-border, #ccefed); border-radius:6px; }
+    .brand-strip{
+      display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap;
+      padding:18px 26px; background:#f9fbfc; border-bottom:1px solid var(--line);
+    }
+    .brand-select{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+    .brand-select label{ color:#344150; font-size:.83rem; font-weight:800; text-transform:uppercase; }
+    .brand-select select{
+      min-width:220px; min-height:44px; padding:9px 34px 9px 12px;
+      border:1px solid #bbcbd2; border-radius:6px; background:#fff;
+      color:var(--ink); font:inherit; font-weight:700; cursor:pointer;
+    }
+    .brand-select select:focus-visible{ outline:3px solid var(--brand-border, #a9d8da); outline-offset:2px; }
+    .brand-identity{ display:flex; align-items:center; gap:12px; min-height:48px; }
+    .brand-identity img{ display:block; max-width:190px; height:42px; width:auto; object-fit:contain; }
+    .brand-identity span{ color:var(--brand-strong); font-size:1.15rem; font-weight:850; }
+    .brand-identity .brand-placeholder{ color:#64717e; font-size:.92rem; font-weight:600; }
+    .brand-callout{
+      margin:14px 26px 0; padding:12px 16px; border-left:4px solid var(--brand);
+      background:var(--brand-soft); color:var(--brand-strong); font-weight:700;
+    }
+    .document-notice{
+      margin:0 0 18px; padding:16px 18px; border:1px solid #f0d6ab;
+      border-left:4px solid #b96110; background:#fff9ef; color:#4b371f;
+    }
+    .document-notice strong{ display:block; margin-bottom:6px; font-size:.98rem; }
+    .document-notice p{ margin:0; line-height:1.5; }
+    .document-notice ul{ margin:8px 0 0; padding-left:20px; line-height:1.5; }
+    .stepper{ grid-template-columns:repeat(3,minmax(0,1fr)); }
+    .step-item.active::before{ box-shadow:none; }
+    .progress{ background:var(--brand); }
+    .form-group{ background:#fff; }
+    .form-group:focus-within{ border-color:var(--brand-border, #80d3cf); box-shadow:0 0 0 3px var(--brand-soft); }
+    .btn-primary, .btn-primary:hover{ background:var(--brand); }
+    .btn-primary:hover{ filter:brightness(.92); }
+    .link-btn:hover, .modal .link-btn:hover{ border-color:var(--brand-border, #98d7d3); }
+    .badge{ border-color:var(--brand-border, #bfe9e6); }
+    @media (max-width:760px){
+      .title-right{ overflow:visible; }
+      .brand-strip{ padding:16px 14px; gap:14px; }
+      .brand-select{ width:100%; align-items:stretch; flex-direction:column; gap:6px; }
+      .brand-select select{ width:100%; }
+      .brand-callout{ margin:12px 14px 0; }
+      .stepper{ grid-template-columns:repeat(3,minmax(0,1fr)); gap:4px; }
+      .step-item{ font-size:.78rem; gap:6px; min-width:0; }
+      .step-item::before{ flex:none; width:24px; height:24px; }
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header"></div>
     <div class="title">
-      <h1>Portale Inserimento Contratti ACEA<span>Gestione pratiche PDV</span></h1>
+      <h1>Portale inserimento contratti<span>Gestione pratiche PDV</span></h1>
       <div class="title-right" aria-label="Strumenti">
         <small id="saveStatus">Bozza non salvata</small>
         <button type="button" class="link-btn top-action" id="btnSaveDraft">Salva bozza</button>
@@ -674,6 +735,23 @@
     </div>
 
     <form id="wizardForm" onsubmit="return false;">
+      <div class="brand-strip">
+        <div class="brand-select">
+          <label for="brand">Operatore</label>
+          <select id="brand" required>
+            <option value="" disabled selected>Seleziona operatore</option>
+            <option value="ACEA">ACEA</option>
+            <option value="PLENITUDE">PLENITUDE</option>
+            <option value="ALPERIA">ALPERIA</option>
+            <option value="SORGENIA">SORGENIA</option>
+          </select>
+        </div>
+        <div class="brand-identity" aria-live="polite">
+          <img id="brandLogo" class="hidden" alt="">
+          <span id="brandName" class="brand-placeholder">Nessun operatore selezionato</span>
+        </div>
+      </div>
+      <div class="brand-callout hidden" id="brandCallout" role="status"></div>
 
       <div class="section active" id="section-anagrafica">
         <h2>Anagrafica cliente</h2>
@@ -793,6 +871,16 @@
       <div class="section" id="section-fornitura">
         <h2>Dati fornitura</h2>
         <p class="help">Operazione, punti di fornitura e offerte selezionate.</p>
+        <div class="document-notice hidden" id="documentNotice" role="status">
+          <strong>Documenti da allegare alla pratica</strong>
+          <p>Per questa richiesta prepara e allega:</p>
+          <ul>
+            <li>Documento che attesta il titolo occupazionale</li>
+            <li>Documenti del cliente</li>
+            <li>Bolletta della fornitura</li>
+          </ul>
+          <p>Allega i file nel canale di invio prima di inoltrare la richiesta.</p>
+        </div>
 
         <div class="grid cols-2">
           <div class="form-group full">
@@ -823,8 +911,8 @@
               <option value="SWITCH_VOLTURA_LUCE">SWITCH CON VOLTURA LUCE</option>
               <option value="SWITCH_VOLTURA_GAS">SWITCH CON VOLTURA GAS</option>
               <option value="SWITCH_VOLTURA_DUAL">SWITCH CON VOLTURA DUAL</option>
-              <option value="VOLTURA_LUCE_ACEA">VOLTURA LUCE (CLIENTE ACEA)</option>
-              <option value="VOLTURA_GAS_ACEA">VOLTURA GAS (CLIENTE ACEA)</option>
+              <option value="VOLTURA_LUCE_ACEA">VOLTURA LUCE (CLIENTE DEL BRAND)</option>
+              <option value="VOLTURA_GAS_ACEA">VOLTURA GAS (CLIENTE DEL BRAND)</option>
             </select>
           </div>
 
@@ -917,6 +1005,14 @@
               <option>SPRINT GAS</option>
             </select>
           </div>
+          <div class="form-group hidden" id="group-offertaOtherLuce">
+            <label for="offertaOtherLuce">Nome offerta luce</label>
+            <input type="text" id="offertaOtherLuce" required>
+          </div>
+          <div class="form-group hidden" id="group-offertaOtherGas">
+            <label for="offertaOtherGas">Nome offerta gas</label>
+            <input type="text" id="offertaOtherGas" required>
+          </div>
 
           <div class="extra-supplies-panel hidden" id="group-extraSupplies">
             <div class="extra-supply-toolbar">
@@ -978,7 +1074,7 @@
       </div>
       <div class="modal-body">
         <div class="toolbar">
-          <input type="search" id="historySearch" placeholder="Cerca per nome / operazione / indirizzo..." />
+          <input type="search" id="historySearch" placeholder="Cerca brand, cliente o operazione..." />
           <div class="history-actions">
             <button class="btn btn-primary" id="btnExportCSV" type="button">Esporta CSV</button>
             <button class="btn btn-danger" id="btnClearHistory" type="button">Svuota archivio</button>
@@ -990,6 +1086,7 @@
             <thead>
               <tr>
                 <th style="min-width:130px;">Data</th>
+                <th style="min-width:120px;">Operatore</th>
                 <th style="min-width:220px;">Cliente</th>
                 <th style="min-width:160px;">Operazione</th>
                 <th style="min-width:240px;">Indirizzo fornitura</th>
@@ -1084,6 +1181,64 @@
       return (value || '').toString().replace(/[&<>"']/g, ch => ({
         '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
       }[ch]));
+    }
+
+    const BRAND_LOGOS = {
+      ACEA:'assets/acea.svg',
+      PLENITUDE:'assets/plenitude.svg',
+      ALPERIA:'assets/alperia.svg',
+      SORGENIA:'assets/sorgenia.svg'
+    };
+    function selectedBrand(){
+      return document.getElementById('brand').value;
+    }
+    function needsOccupancyDocuments(operation){
+      return operation.startsWith('SUBENTRO') || operation.startsWith('SWITCH_VOLTURA');
+    }
+    function updateDocumentNotice(){
+      const brand = selectedBrand();
+      const operation = document.getElementById('tipoOp').value;
+      const needsDocuments = (brand === 'ALPERIA' || brand === 'SORGENIA') &&
+        (needsOccupancyDocuments(operation) || serializeExtraSupplies().some(item => needsOccupancyDocuments(item.requestType)));
+      document.getElementById('documentNotice').classList.toggle('hidden', !needsDocuments);
+      return needsDocuments;
+    }
+    function updateOfferFields(){
+      const operation = document.getElementById('tipoOp').value;
+      const priv = document.getElementById('tipoCliente').value === 'privato';
+      const isAcea = selectedBrand() === 'ACEA';
+      const hasLuce = operation.includes('LUCE') || operation.includes('DUAL');
+      const hasGas = operation.includes('GAS') || operation.includes('DUAL');
+      setGroupVisibility('group-offertaPrivatoLuce', isAcea && priv && hasLuce);
+      setGroupVisibility('group-offertaPrivatoGas', isAcea && priv && hasGas);
+      setGroupVisibility('group-offertaBusLuce', isAcea && !priv && hasLuce);
+      setGroupVisibility('group-offertaBusGas', isAcea && !priv && hasGas);
+      setGroupVisibility('group-offertaOtherLuce', !!selectedBrand() && !isAcea && hasLuce);
+      setGroupVisibility('group-offertaOtherGas', !!selectedBrand() && !isAcea && hasGas);
+    }
+    function updateBrand(){
+      const brand = selectedBrand();
+      document.body.dataset.brand = brand;
+      document.title = brand ? `Portale contratti ${brand}` : 'Portale inserimento contratti';
+      const logo = document.getElementById('brandLogo');
+      const name = document.getElementById('brandName');
+      logo.classList.toggle('hidden', !brand);
+      logo.src = BRAND_LOGOS[brand] || '';
+      logo.alt = brand ? `Logo ${brand}` : '';
+      name.classList.toggle('hidden', !!brand && brand !== 'ACEA');
+      name.classList.toggle('brand-placeholder', !brand);
+      name.textContent = brand || 'Nessun operatore selezionato';
+      const callout = document.getElementById('brandCallout');
+      const callType = brand === 'ALPERIA' ? 'CHECK CALL' :
+        (brand === 'SORGENIA' || brand === 'PLENITUDE') ? 'DIGITAL CHECK CALL' : '';
+      callout.textContent = callType ? `${brand}: ricordati la ${callType}.` : '';
+      callout.classList.toggle('hidden', !callType);
+      ['VOLTURA_LUCE_ACEA','VOLTURA_GAS_ACEA'].forEach(id => {
+        const option = document.querySelector(`#tipoOp option[value="${id}"]`);
+        if(option) option.textContent = `VOLTURA ${id.includes('LUCE') ? 'LUCE' : 'GAS'} (CLIENTE ${brand || 'DEL BRAND'})`;
+      });
+      updateOfferFields();
+      updateDocumentNotice();
     }
 
     const EXTRA_REQUEST_TYPES = {
@@ -1207,6 +1362,7 @@
       card.querySelector('[data-extra-field="citta"]').value = data.citta || '';
       card.querySelector('[data-extra-field="cap"]').value = data.cap || '';
       card.querySelectorAll('input').forEach(normalizeFieldValue);
+      updateDocumentNotice();
     }
     function serializeExtraSupplies(){
       return [...document.querySelectorAll('#extraSuppliesList .extra-supply-card')].map(card => ({
@@ -1278,6 +1434,7 @@
         const isEmpty = (f.tagName === 'SELECT') ? (f.value === '' || f.selectedIndex === 0) : (f.value.trim() === '');
         if(isEmpty){
           const label = (f.closest('.form-group')?.querySelector('label')?.innerText || f.id);
+          if(!container.classList.contains('active')) show(sections.indexOf(container));
           alert(`Compila il campo: ${label}`);
           f.focus();
           return false;
@@ -1286,9 +1443,16 @@
       return true;
     }
     function validateAll(){
-      return validateSection('section-anagrafica') &&
+      return validateBrand() && validateSection('section-anagrafica') &&
              validateSection('section-fornitura') &&
              validateSection('section-chiusura');
+    }
+    function validateBrand(){
+      if(selectedBrand()) return true;
+      alert('Seleziona l\'operatore.');
+      show(0);
+      document.getElementById('brand').focus();
+      return false;
     }
 
     function collectVisibleLabeledData(){
@@ -1351,7 +1515,14 @@
     function buildMessage(){
       normalizeFormValues();
       const body = collectVisibleLabeledData();
-      return `Ciao!\nTi chiedo di inserire questa pratica e darmi conferma inserimento:\n\n${body}\n\nGrazie per il supporto`;
+      const brand = selectedBrand();
+      const callType = brand === 'ALPERIA' ? 'CHECK CALL' :
+        (brand === 'SORGENIA' || brand === 'PLENITUDE') ? 'DIGITAL CHECK CALL' : '';
+      const reminders = [];
+      if(callType) reminders.push(`PROMEMORIA: ${callType} ${brand}`);
+      if(updateDocumentNotice()) reminders.push('ALLEGATI DA INVIARE: DOCUMENTO TITOLO OCCUPAZIONALE, DOCUMENTI DEL CLIENTE E BOLLETTA');
+      const reminderBlock = reminders.length ? `\n\n— PROMEMORIA —\n${reminders.join('\n')}` : '';
+      return `Ciao!\nTi chiedo di inserire questa pratica per ${brand} e darmi conferma inserimento:\n\n${body}${reminderBlock}\n\nGrazie per il supporto`;
     }
 
     function resolvedAnagraficaAddress(){
@@ -1367,7 +1538,7 @@
     }
 
     document.getElementById('next1').onclick = () => {
-      if(validateSection('section-anagrafica')) show(1);
+      if(validateBrand() && validateSection('section-anagrafica')) show(1);
     };
     document.getElementById('back2').onclick = () => show(0);
     document.getElementById('next2').onclick = () => {
@@ -1384,7 +1555,10 @@
       setGroupVisibility('group-codiceLegale', !priv);
       document.getElementById('label-nome').textContent = priv ? 'Nome' : 'Ragione Sociale';
       document.getElementById('label-codice').textContent = priv ? 'Codice Fiscale' : 'Partita IVA';
+      updateOfferFields();
     });
+
+    document.getElementById('brand').addEventListener('change', updateBrand);
 
     document.getElementById('useSameAddress').addEventListener('change', e => {
       setGroupVisibility('group-indirizzoNew', e.target.value === 'new');
@@ -1392,7 +1566,6 @@
 
     document.getElementById('tipoOp').addEventListener('change', function(){
       const v = this.value;
-      const priv = document.getElementById('tipoCliente').value === 'privato';
 
       const isDual = v.includes('DUAL');
       const isSwitch = v.startsWith('SWITCH');
@@ -1413,12 +1586,10 @@
       setGroupVisibility('group-titoloOcc', isSubOrVolt);
       setGroupVisibility('group-dataPossesso', isSubOrVolt);
       setGroupVisibility('group-consumoAnnuale', requiresConsumoAnnualeGas);
-      setGroupVisibility('group-offertaPrivatoLuce',  priv && (isLuceOnly || isDual));
-      setGroupVisibility('group-offertaPrivatoGas',   priv && (isGasOnly  || isDual));
-      setGroupVisibility('group-offertaBusLuce',     !priv && (isLuceOnly || isDual));
-      setGroupVisibility('group-offertaBusGas',      !priv && (isGasOnly  || isDual));
+      updateOfferFields();
       resetExtraSupplies();
       updateExtraSupplyControls(v);
+      updateDocumentNotice();
     });
 
     document.getElementById('metodoPag').addEventListener('change', e => {
@@ -1446,27 +1617,29 @@
     }
 
     function loadDraftObj(obj){
-      ['tipoCliente','useSameAddress','tipoOp','metodoPag'].forEach(id=>{
-        if(obj[id] !== undefined && document.getElementById(id)){
-          document.getElementById(id).value = obj[id];
+      const data = { ...obj, brand: obj.brand || 'ACEA' };
+      ['brand','tipoCliente','useSameAddress','tipoOp','metodoPag'].forEach(id=>{
+        if(data[id] !== undefined && document.getElementById(id)){
+          document.getElementById(id).value = data[id];
         }
       });
 
-      ['tipoCliente','useSameAddress','tipoOp','metodoPag'].forEach(id=>{
+      ['brand','tipoCliente','useSameAddress','tipoOp','metodoPag'].forEach(id=>{
         const el = document.getElementById(id);
         if(el){ el.dispatchEvent(new Event('change')); }
       });
 
-      Object.keys(obj).forEach(id=>{
+      Object.keys(data).forEach(id=>{
         if(document.getElementById(id)){
-          document.getElementById(id).value = obj[id];
+          document.getElementById(id).value = data[id];
           normalizeFieldValue(document.getElementById(id));
         }
       });
       resetExtraSupplies();
-      if(Array.isArray(obj.extraSupplies)){
-        obj.extraSupplies.forEach(item => addExtraSupply(item.kind, item));
+      if(Array.isArray(data.extraSupplies)){
+        data.extraSupplies.forEach(item => addExtraSupply(item.kind, item));
       }
+      updateDocumentNotice();
     }
 
     function loadDraft(){
@@ -1510,8 +1683,10 @@
       const btn = e.target.closest('button[data-action="remove-extra-supply"]');
       if(!btn) return;
       btn.closest('.extra-supply-card')?.remove();
+      updateDocumentNotice();
       saveDraft();
     });
+    document.getElementById('extraSuppliesList').addEventListener('change', updateDocumentNotice);
 
     const PRACTICES_KEY = 'acea_portale_pratiche_v1';
     const historyCountEl = document.getElementById('historyCount');
@@ -1562,10 +1737,11 @@
         verified: false,
         message,
         fields,
+        brand: fields['brand'] || 'ACEA',
         tipoCliente: tipo,
         cliente: nominativo || '',
         codice: fields['codice'] || '',
-        operazione: fields['tipoOp'] || '',
+        operazione: document.getElementById('tipoOp').selectedOptions[0]?.textContent || '',
         residenzaCliente: fields['residenzaCliente'] || '',
         indirizzoFornitura: resolvedFornituraAddress() || '',
         metodoPag: fields['metodoPag'] || '',
@@ -1596,7 +1772,7 @@
       tbody.innerHTML = '';
 
       list.forEach(p => {
-        const hay = [p.cliente, p.operazione, p.residenzaCliente, p.indirizzoFornitura, p.codice, p.pod, p.pdr, p.consumoAnnuale, p.extraForniture, p.metodoPag].join(' ').toLowerCase();
+        const hay = [p.brand || p.fields?.brand || 'ACEA', p.cliente, p.operazione, p.residenzaCliente, p.indirizzoFornitura, p.codice, p.pod, p.pdr, p.consumoAnnuale, p.extraForniture, p.metodoPag].join(' ').toLowerCase();
         if(q && !hay.includes(q)) return;
         shown++;
 
@@ -1604,6 +1780,7 @@
         const stato = p.verified ? '<span class="badge badge-ok">Inserita</span>' : '<span class="badge">Da inserire</span>';
         tr.innerHTML = `
           <td>${toLocalDateTime(p.created)}</td>
+          <td><strong>${escapeHtml(p.brand || p.fields?.brand || 'ACEA')}</strong></td>
           <td class="trunc" title="${(p.cliente||'-').replace(/"/g,'&quot;')}">
             <div><strong>${p.cliente || '-'}</strong></div>
             <div class="muted">${p.codice || ''}</div>
@@ -1657,6 +1834,7 @@
     let currentDetailId = null;
 
     const LABELS = {
+      brand:"Operatore",
       tipoCliente:"Tipo Cliente",
       nome:"Nome",
       cognome:"Cognome",
@@ -1693,13 +1871,15 @@
       offertaPrivatoGas:"Offerta Gas (Privato)",
       offertaBusLuce:"Offerta Luce (Business)",
       offertaBusGas:"Offerta Gas (Business)",
+      offertaOtherLuce:"Offerta Luce",
+      offertaOtherGas:"Offerta Gas",
       metodoPag:"Metodo di Pagamento",
       iban:"IBAN"
     };
 
     const ORDER = {
-      ANAGRAFICA: ["tipoCliente","nome","cognome","azienda","codice","legaleRapp","codiceLegale","dataNascita","luogoNascita","indirizzo","citta","cap","telefono","mail","tipoDoc","numeroDoc","dataRilascio","dataScadenza","rilasciatoDa"],
-      FORNITURA: ["useSameAddress","indirizzoForn","tipoOp","residenzaCliente","pod","pdr","fornitoreUscenteLuce","fornitoreUscenteGas","matricola","titoloOcc","dataPossesso","consumoAnnuale","extraSupplies","offertaPrivatoLuce","offertaPrivatoGas","offertaBusLuce","offertaBusGas"],
+      ANAGRAFICA: ["brand","tipoCliente","nome","cognome","azienda","codice","legaleRapp","codiceLegale","dataNascita","luogoNascita","indirizzo","citta","cap","telefono","mail","tipoDoc","numeroDoc","dataRilascio","dataScadenza","rilasciatoDa"],
+      FORNITURA: ["useSameAddress","indirizzoForn","tipoOp","residenzaCliente","pod","pdr","fornitoreUscenteLuce","fornitoreUscenteGas","matricola","titoloOcc","dataPossesso","consumoAnnuale","extraSupplies","offertaPrivatoLuce","offertaPrivatoGas","offertaBusLuce","offertaBusGas","offertaOtherLuce","offertaOtherGas"],
       CHIUSURA: ["metodoPag","iban"]
     };
 
@@ -1751,9 +1931,9 @@
       currentDetailId = id;
       detailTitle.textContent = `Dettagli pratica - ${p.cliente || 'Cliente'} (${toLocalDateTime(p.created)})`;
       const stato = p.verified ? 'Inserita' : 'Da inserire';
-      detailMeta.innerHTML = `<b>Canale:</b> ${p.channel} · <b>Stato:</b> ${stato} · <b>Operazione:</b> ${p.operazione || '-'} · <b>Indirizzo fornitura:</b> ${p.indirizzoFornitura || '-'}`;
+      detailMeta.innerHTML = `<b>Operatore:</b> ${escapeHtml(p.brand || p.fields?.brand || 'ACEA')} · <b>Canale:</b> ${p.channel} · <b>Stato:</b> ${stato} · <b>Operazione:</b> ${p.operazione || '-'} · <b>Indirizzo fornitura:</b> ${p.indirizzoFornitura || '-'}`;
       detailMessage.textContent = p.message || '';
-      buildSummaryFromFields(p.fields||{});
+      buildSummaryFromFields({brand:p.brand || p.fields?.brand || 'ACEA', ...(p.fields || {})});
       buildDiff(p);
       btnToggleVerified.textContent = p.verified ? 'Segna non inserita' : 'Segna come inserita';
       switchTab('summary');
@@ -1787,7 +1967,8 @@
     tabMessage.addEventListener('click', ()=>switchTab('message'));
 
     function summaryAsText(){
-      const fields = (getPractices().find(p=>p.id===currentDetailId)||{}).fields || {};
+      const practice = getPractices().find(p=>p.id===currentDetailId) || {};
+      const fields = {brand:practice.brand || practice.fields?.brand || 'ACEA', ...(practice.fields || {})};
       const mk = (k)=> LABELS[k]||k;
       const lines = [];
       lines.push('— ANAGRAFICA —');
@@ -1836,7 +2017,7 @@
       document.getElementById('btnToggleVerified').textContent = list[idx].verified ? 'Segna non inserita' : 'Segna come inserita';
       renderHistory();
       const stato = list[idx].verified ? 'Inserita' : 'Da inserire';
-      detailMeta.innerHTML = `<b>Canale:</b> ${list[idx].channel} · <b>Stato:</b> ${stato} · <b>Operazione:</b> ${list[idx].operazione || '-'} · <b>Indirizzo fornitura:</b> ${list[idx].indirizzoFornitura || '-'}`;
+      detailMeta.innerHTML = `<b>Operatore:</b> ${escapeHtml(list[idx].brand || list[idx].fields?.brand || 'ACEA')} · <b>Canale:</b> ${list[idx].channel} · <b>Stato:</b> ${stato} · <b>Operazione:</b> ${list[idx].operazione || '-'} · <b>Indirizzo fornitura:</b> ${list[idx].indirizzoFornitura || '-'}`;
     });
 
     tbody.addEventListener('click', async e => {
@@ -1879,10 +2060,10 @@
         alert('Archivio vuoto.');
         return;
       }
-      const headers = ['id','created','channel','verified','tipoCliente','cliente','codice','operazione','residenzaCliente','indirizzoFornitura','metodoPag','iban','pod','pdr','consumoAnnuale','extraForniture','fornitoreUscenteLuce','fornitoreUscenteGas'];
+      const headers = ['id','created','brand','channel','verified','tipoCliente','cliente','codice','operazione','residenzaCliente','indirizzoFornitura','metodoPag','iban','pod','pdr','consumoAnnuale','extraForniture','fornitoreUscenteLuce','fornitoreUscenteGas'];
       const rows = [headers.join(';')];
       list.forEach(p=>{
-        const row = headers.map(h=> `"${(p[h] ?? '').toString().replace(/[\r\n]+/g,' ').replace(/;/g, ',')}"`).join(';');
+        const row = headers.map(h=> `"${(h === 'brand' ? (p.brand || p.fields?.brand || 'ACEA') : (p[h] ?? '')).toString().replace(/[\r\n]+/g,' ').replace(/;/g, ',').replace(/"/g, '""')}"`).join(';');
         rows.push(row);
       });
       const blob = new Blob([rows.join('\n')], {type:'text/csv;charset=utf-8;'});
